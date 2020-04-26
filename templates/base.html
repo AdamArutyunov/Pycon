@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+      <link href="/static/css/codemirror.css" rel="stylesheet">
+      <script src="/static/js/codemirror.js"></script>
+      <script src="/static/js/mode/python.js"></script>
+      <title>{{title}}</title>
+  </head>
+<body>
+  <header>
+      <div id="logo">
+        <img src="/static/img/logo.png">
+      </div>
+      <div id="header-links">
+        <div class="link-wrapper">
+          Главная
+        </div>
+        <div class="link-wrapper">
+          <a href="/problems">Задачи</a>
+        </div>
+        <div class="link-wrapper">
+          <a href="/contests">Контесты</a>
+        </div>
+      </div>
+      <div id="login-block">
+        <a href="/login">Войти</a><br>
+        <a href="/register">Зарегистрироваться</a>
+      </div>
+  </header>
+  <main role="main" id="main">
+      {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <div id="footer-div"></div>
+  </footer>
+</body>
+</html>

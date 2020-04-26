@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    {{ problem.name }}
+  </h1>
+  <h3 id="limits">
+    {{ problem.time_limit }} с, {{ problem.memory_limit }} Мб.
+  </h3>
+  <p>
+    {{ problem.situation }}
+  </p>
+  {% if problem.input_data %}
+    <h3>
+      Входные данные
+    </h3>
+    <p>
+      {{ problem.input_data }}
+    </p>
+  {% endif %}
+  {% if problem.output_data %}
+    <h3>
+      Выходные данные
+    </h3>
+    <p>
+      {{ problem.output_data }}
+    </p>
+  {% endif %}
+  {% if problem.examples %}
+    <h3>
+      Примеры
+    </h3>
+    {% for example in problem.examples %}
+      <div class="example">
+        <div class="example-input">
+          <span class="small-grey-label">
+            Входные данные
+          </span>
+          <div class="data-box">
+            {{ example.input_data }}
+          </div>
+        </div>
+        <div class="example-output">
+          <span class="small-grey-label">
+            Выходные данные
+          </span>
+          <div class="data-box">
+            {{ example.output_data }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <h3>
+    Сдать
+  </h3>
+  {% if current_user.is_authenticated() %}
+    <form method="post" enctype="multipart/form-data" name="file-solution-send">
+      <input type="file" class="file-input" name="solution-file">
+      <input type="submit" class="submit-button" name="submit-file-button" value="Отправить">
+    </form>
+    <form method="post" name="text-solution-send">
+      <textarea id="solution-text" name="solution-text"><br>
+      <input type="submit" class="submit-button" name="submit-text-button" value="Отправить">
+    </form>
+  {% else %}
+    <p>
+      Чтобы сдать задачу, вам необходимо <a href="/login">войти в систему</a> или <a href="/register">зарегистрироваться</a>.
+    </p>
+  {% endif %}
+
+  <script type="text/javascript">
+    CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: 'python', lineNumbers: true})
+  </script>
+{% endblock %}
