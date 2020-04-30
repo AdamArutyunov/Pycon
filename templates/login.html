@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="register-block">
+  <h2 class="black-label">Авторизация</h2>
+  <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <div class="small-block">
+          {{ form.login_or_email.label(class="normal-grey-label") }}<br>
+          {{ form.login_or_email(class="login-field") }}<br>
+          {% for error in form.login_or_email.errors %}
+              <div class="alert alert-danger" role="alert">
+                  {{ error }}
+              </div>
+          {% endfor %}
+      </div>
+      <div class="small-block">
+          {{ form.password.label(class="normal-grey-label") }}<br>
+          {{ form.password(class="login-field", type="password") }}<br>
+          {% for error in form.password.errors %}
+              <div class="alert alert-danger" role="alert">
+                  {{ error }}
+              </div>
+          {% endfor %}
+      </div>
+      <div class="normal-block">
+        {{ form.remember_me() }} {{ form.remember_me.label }}
+      </div>
+      <div class="big-block">
+        {{ form.submit(type="submit", class="btn btn-primary") }}
+      </div>
+      <div class="small-block">
+        <p class="alert alert-danger" role="alert">
+          {{message}}
+        </p>
+      </div>
+  </form>
+</div>
+{% endblock %}

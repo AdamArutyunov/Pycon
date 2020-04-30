@@ -5,16 +5,19 @@
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
       <link rel="stylesheet" type="text/css" href="/static/css/style.css">
       <link href="/static/css/codemirror.css" rel="stylesheet">
+      <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
       <script src="/static/js/codemirror.js"></script>
-      <script src="/static/js/mode/python.js"></script>
+      <script src="/static/js/python.js"></script>
       <title>{{title}}</title>
   </head>
 <body>
   <header>
-      <div id="logo">
-        <img src="/static/img/logo.png">
-      </div>
-      <div id="header-links">
+      <a href="/" style="border: none;">
+        <div id="logo">
+          <img src="/static/img/logo.png">
+        </div>
+        <div id="header-links">
+      </a>
         <div class="link-wrapper">
           Главная
         </div>
@@ -26,8 +29,13 @@
         </div>
       </div>
       <div id="login-block">
-        <a href="/login">Войти</a><br>
-        <a href="/register">Зарегистрироваться</a>
+        {% if current_user.is_authenticated %}
+          Вы вошли как <b>{{ current_user.login }}</b><br>
+          <a href="/logout">Выйти</a>
+        {% else %}
+          <a href="/login">Войти</a><br>
+          <a href="/register">Зарегистрироваться</a>
+        {% endif %}
       </div>
   </header>
   <main role="main" id="main">

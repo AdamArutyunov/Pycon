@@ -12,7 +12,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=True)
+    login = Column(String, nullable=True)
     email = Column(String, index=True, unique=True, nullable=False)
     hashed_password = Column(String, nullable=True)
     submissions = orm.relation("Submission", back_populates='submitter')

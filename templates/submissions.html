@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Мои посылки
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if submissions %}
+      <table class="submissions-table">
+        {% for submission in submissions %}
+          <tr>
+            <td class="id-td">
+              {{ submission.id }}
+            </td>
+            <td class="timestamp-td">
+              {{ submission.submit_timestamp.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
+            </td>
+            <td class="problemname-td">
+              <a href="/problems/{{ submission.problem.id }}">{{ submission.problem.name }}</a>
+            </td>
+            <td class="verdict-td">
+              {% if submission.verdict == None %}
+                <span class="verdict-neutral">
+                  Отправлено на проверку
+                </span>
+              {% elif submission.verdict == 'TG' %}
+                <span class="verdict-neutral">
+                  {% if submission.test %}
+                    Тестируется #{{ submission.test }}
+                  {% else %}
+                    Тестируется
+                  {% endif %}
+                </span>
+              {% elif submission.verdict == 'OK' %}
+                <span class="verdict-good">
+                  {{ submission.verdict }}
+                </span>
+              {% else %}
+                <span class="verdict-bad">
+                  {{ submission.verdict }} #{{ submission.test }}
+                </span>
+              {% endif %}
+            </td>
+            <td class="time-td">
+              <span>
+                {{ submission.time if submission.time else 0 }} ms
+              </span>
+            </td>
+            <td class="memory-td">
+              <span>
+                {{ submission.memory if submission.memory else 0 }} KB
+              </span>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}

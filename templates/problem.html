@@ -1,75 +1,101 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>
-    {{ problem.name }}
-  </h1>
-  <h3 id="limits">
-    {{ problem.time_limit }} с, {{ problem.memory_limit }} Мб.
-  </h3>
-  <p>
-    {{ problem.situation }}
-  </p>
-  {% if problem.input_data %}
-    <h3>
-      Входные данные
+  <div class="content-header">
+    <h1>
+      {{ problem.name }}
+    </h1>
+    <h3 id="limits">
+      {{ problem.time_limit }} с, {{ problem.memory_limit }} Мб.
     </h3>
-    <p>
-      {{ problem.input_data }}
-    </p>
+  </div>
+  <div class="content-block">
+    {{ problem.situation|safe }}
+  </div>
+  {% if problem.input_data %}
+    <div class="content-block">
+      <h3>
+        Входные данные
+      </h3>
+      {{ problem.input_data|safe }}
+    </div>
   {% endif %}
   {% if problem.output_data %}
-    <h3>
-      Выходные данные
-    </h3>
-    <p>
-      {{ problem.output_data }}
-    </p>
+    <div class="content-block">
+      <h3>
+        Выходные данные
+      </h3>
+      {{ problem.output_data|safe }}
+    </div>
   {% endif %}
   {% if problem.examples %}
+    <div class="content-block">
+      <h3>
+        Примеры
+      </h3>
+      {% for example in problem.examples %}
+        <div class="example">
+          <div class="example-input">
+            <span class="small-grey-label">
+              Входные данные
+            </span>
+            <div class="data-box">
+              {{ example.input_data|safe }}
+            </div>
+          </div>
+          <div class="example-output">
+            <span class="small-grey-label">
+              Выходные данные
+            </span>
+            <div class="data-box">
+              {{ example.output_data|safe }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="content-block">
     <h3>
-      Примеры
+      Сдать
     </h3>
-    {% for example in problem.examples %}
-      <div class="example">
-        <div class="example-input">
-          <span class="small-grey-label">
-            Входные данные
-          </span>
-          <div class="data-box">
-            {{ example.input_data }}
-          </div>
-        </div>
-        <div class="example-output">
-          <span class="small-grey-label">
-            Выходные данные
-          </span>
-          <div class="data-box">
-            {{ example.output_data }}
-          </div>
-        </div>
+    {% if current_user.is_authenticated %}
+      <div class="normal-block">
+        <form method="post" enctype="multipart/form-data" name="file-solution-send" action="">
+          {{ submit_file_form.hidden_tag() }}
+          <label class="label">
+            <span class="primary-button">Загрузить файл</span>
+            {{ submit_file_form.data(class="nodisp", onchange="this.form.submit()") }}
+          </label>
+          {% for error in submit_file_form.data.errors %}
+              <div class="alert alert-danger small-block" role="alert">
+                  {{ error }}
+              </div>
+          {% endfor %}
+        </form>
       </div>
-    {% endfor %}
-  {% endif %}
-  <h3>
-    Сдать
-  </h3>
-  {% if current_user.is_authenticated() %}
-    <form method="post" enctype="multipart/form-data" name="file-solution-send">
-      <input type="file" class="file-input" name="solution-file">
-      <input type="submit" class="submit-button" name="submit-file-button" value="Отправить">
-    </form>
-    <form method="post" name="text-solution-send">
-      <textarea id="solution-text" name="solution-text"><br>
-      <input type="submit" class="submit-button" name="submit-text-button" value="Отправить">
-    </form>
-  {% else %}
-    <p>
-      Чтобы сдать задачу, вам необходимо <a href="/login">войти в систему</a> или <a href="/register">зарегистрироваться</a>.
-    </p>
-  {% endif %}
+      <div class="big-block">
+        <form method="post" name="text-solution-send" action="">
+          {{ submit_text_form.hidden_tag() }}
+          {{ submit_text_form.data(id="solution-text") }}
+
+          {% for error in submit_text_form.data.errors %}
+              <div class="alert alert-danger small-block" role="alert">
+                  {{ error }}
+              </div>
+          {% endfor %}
+
+          <div class="small-block">
+            {{ submit_text_form.submit(class="submit_button") }}
+          </div>
+        </form>
+      </div>
+    {% else %}
+        Чтобы сдать задачу, вам необходимо <a href="/login">войти в систему</a> или <a href="/register">зарегистрироваться</a>.
+    {% endif %}
+  </div>
 
   <script type="text/javascript">
-    CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: 'python', lineNumbers: true})
+    var CM = CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: 'python', lineNumbers: true});
   </script>
 {% endblock %}

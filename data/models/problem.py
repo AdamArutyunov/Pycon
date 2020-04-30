@@ -21,7 +21,6 @@ class Problem(SqlAlchemyBase, SerializerMixin):
     situation = Column(String, nullable=False)
     input_data = Column(String, nullable=True)
     output_data = Column(String, nullable=True)
-    examples = Column(ARRAY(Integer), nullable=True)
     solution = Column(String, nullable=False)
     tests = orm.relation("Test", back_populates='problem')
     time_limit = Column(Integer, nullable=True)

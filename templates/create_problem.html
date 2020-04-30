@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <form method="post" name="create-problem">
+    <h1>
+      Создать задачу
+    </h1>
+
+    <div class="content-block">
+      <h3>
+        Название
+      </h3>
+      <input type="text" name="problem-name" class="static-input">
+    </div>
+
+    <div class="content-block">
+      <h3>
+        Ограничения
+      </h3>
+      <input type="number" name="time-limit"> с, <input type="number" name="memory-limit"> Мб.
+    </div>
+
+    <div class="content-block">
+      <h3>
+        Условие
+      </h3>
+      <textarea name="description" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+    </div>
+
+    <div class="content-block">
+      <h3>
+        Входные данные
+      </h3>
+      <textarea name="input-data" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+    </div>
+
+    <div class="content-block">
+      <h3>
+        Выходные данные
+      </h3>
+      <textarea name="output-data" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+    </div>
+
+    <div class="content-block">
+      <h3>Примеры</h3>
+      <input type="text" placeholder="Номера тестов через пробел..." class="static-input">
+    </div>
+
+    <input type="submit" value="Создать">
+  </form>
+{% endblock %}

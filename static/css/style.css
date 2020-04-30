@@ -7,6 +7,68 @@ html {
   height: 100%;
 }
 
+:root {
+  --primary-color: #FEC811;
+  --light-grey: #D0D0D0;
+  --very-light-grey: #ECECEC;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-Light.ttf");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-LightItalic.ttf");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-Italic.ttf");
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-Semibold.ttf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-SemiboldItalic.ttf");
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-Black.ttf");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/static/css/fonts/Lato/Lato-BlackItalic.ttf");
+  font-weight: 900;
+  font-style: italic;
+}
+
 body {
   position: relative;
   font-family: "Lato";
@@ -35,9 +97,250 @@ a:hover {
   border-color: #E00;
 }
 
+h1 {
+  font-weight: bold;
+  font-size: 50pt;
+}
+
+h2 {
+  font-size: 30pt;
+  margin-bottom: 50px;
+}
+
+h3 {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 19pt;
+}
+
+textarea, input {
+  font-family: "Lato";
+}
+
+textarea {
+  padding: 5px;
+}
+
+input[type="text"], input[type="password"] {
+  height: 30px;
+  font-size: 12pt;
+}
+
+input[type="submit"]  {
+  display: inline-block;
+  font-size: 15pt;
+  font-weight: normal;
+  text-align: center;
+  height: 45px;
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 2px 12px;
+}
+
+input[type="number"] {
+  width: 50px;
+}
+
+input[type="file"] {
+  background-color: white;
+  font-family: "Consolas";
+  font-size: 15px;
+}
+
+input:active, input:focus, textarea:active, textarea:focus {
+  outline: none;]
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: inset 0 0 0 50px #fff !important;
+}
+
+label {
+  font-size: 12pt;
+}
+
+td {
+  padding: 5px 5px 15px 5px;
+  vertical-align: top;
+  border: none;
+}
+
+table {
+  border: none;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12pt;
+}
+
+table a {
+  font-weight: bold;
+}
+
+
+.nodisp {
+  display: none;
+}
+
+.primary-button {
+  display: inline-block;
+  font-size: 15pt;
+  font-weight: normal;
+  text-align: center;
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.CodeMirror {
+  font-size: 10pt;
+  height: 500px;
+}
+
 .link-wrapper {
   display: inline-block;
   margin-right: 30px;
+}
+
+.content-block {
+  margin-top: 25px;
+  margin-bottom: 50px;
+}
+
+.content-header {
+  margin-bottom: 50px;
+}
+
+.static-textarea {
+  width: 75%;
+  height: 200px;
+  resize: none;
+  font-family: "Consolas";
+  outline: none;
+}
+
+.static-input {
+  width: 50%;
+}
+
+.small-grey-label {
+  font-size: 10pt;
+  font-weight: 100;
+  color: var(--light-grey);
+}
+
+.normal-grey-label {
+  font-weight: 100;
+  color: var(--light-grey);
+}
+
+.example {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  margin-top: 40px;
+}
+
+.example-input, .example-output {
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+  margin-right: 30px;
+  margin-bottom: 10px;
+  vertical-align: top;
+}
+
+.data-box {
+  width: 100%;
+  height: 100%;
+  font-family: "Consolas";
+  border: 1.5px solid var(--light-grey);
+  font-size: 13pt;
+  padding: 10px;
+}
+
+.register-block {
+  width: max-content;
+  margin: 0 30%;
+}
+
+.login-field {
+  border: none;
+  border-bottom: 1px solid var(--light-grey);
+  width: 250px;
+}
+
+.alert {
+  font-size: 13pt;
+}
+
+.alert-danger {
+  color: #DD0000;
+}
+
+.big-fucking-span {
+  font-size: 150pt;
+  font-weight: 900;
+}
+
+.primary-span {
+  color: var(--primary-color);
+}
+
+.small-block {
+  margin: 30px 0;
+}
+
+.normal-block {
+  margin: 50px 0;
+}
+
+.big-block {
+  margin: 75px 0;
+}
+
+.black-label {
+  font-weight: 900;
+}
+
+.id-td {
+  max-width: 5%;
+}
+
+.timestamp-td {
+  max-width: 10%;
+}
+
+.time-td {
+  max-width: 10%;
+}
+
+.memory-td {
+  max-width: 10%;
+}
+
+.verdict-td {
+  float: right;
+  padding-right: 60px;
+}
+
+.verdict-neutral {
+  color: lightgrey;
+}
+
+.verdict-bad {
+  color: #DD0000;
+}
+
+.verdict-good {
+  color: #40AA3B;
+}
+
+#limits {
+  color: var(--light-grey);
 }
 
 #login-block {
@@ -53,7 +356,7 @@ a:hover {
 
 #footer-div {
   height: 30px;
-  background-color: #FEC811;
+  background-color: var(--primary-color);
 }
 
 #logo {
@@ -66,7 +369,8 @@ a:hover {
 #main {
   margin-top: 75px;
   margin-left: 150px;
-  width: 55%;
+  width: 65%;
+  min-width: 600px;
   padding-bottom: 200px;
 }
 
