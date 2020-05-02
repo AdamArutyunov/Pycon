@@ -1,5 +1,5 @@
 import sys
-from flask import Flask, render_template, abort, redirect
+from flask import Flask, render_template, abort, redirect, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from multiprocessing import Process
 from data import db_session
@@ -21,10 +21,17 @@ app.config['DATABASE_URI'] = DATABASE_URI
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 
 PyconSolutionChecker = SolutionChecker()
 PyconSolutionCheckerProcess = Process(target=PyconSolutionChecker.parse)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    session = db_session.create_session()
+    return session.query(User).get(user_id)
 
 
 @app.route('/')
@@ -37,7 +44,15 @@ def not_found(error):
     return render_template('404.html', title="404")
 
 
-@app.route('/problems/<problem_id>', methods=["GET", "POST"])
+@app.route('/problems')
+def problems():
+    session = db_session.create_session()
+    problems = session.query(Problem).order_by(Problem.id.desc()).all()
+    return render_template('problems.html', title="Задачи",
+                           problems=problems)
+
+
+@app.route('/problems/<int:problem_id>', methods=["GET", "POST"])
 def problem(problem_id):    
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -71,11 +86,22 @@ def create_problem():
 
 
 @app.route('/submissions')
+@login_required
 def submissions():
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
     return render_template('submissions.html', title="Посылки",
+                           submissions=submissions)
+
+
+@app.route('/problems/<int:problem_id>/submissions')
+def problem_submissions(problem_id):
+    session = db_session.create_session()
+    submissions = session.query(Submission).join(Problem).filter((Submission.submitter == current_user) &
+                                                                 (Problem.id == problem_id))\
+                  .order_by(Submission.id.desc()).all()
+    return render_template('submissions.html', title=f"Посылки задачи №{problem_id}",
                            submissions=submissions)
 
 
@@ -99,14 +125,11 @@ def register():
         
         session.add(user)
         session.commit()
+
+        login_user(user)
+        
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
-    
-
-@login_manager.user_loader
-def load_user(user_id):
-    session = db_session.create_session()
-    return session.query(User).get(user_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -118,7 +141,7 @@ def login():
                                           (User.login == form.login_or_email.data)).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            return redirect(request.args.get('next') or '/')
         return render_template('login.html',
                                message="Неправильный логин или пароль.",
                                form=form)
@@ -128,8 +151,9 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    current_user
     logout_user()
-    return redirect("/")
+    return redirect(request.args.get('next') or '/')
 
 
 if __name__ == '__main__':

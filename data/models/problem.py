@@ -6,13 +6,6 @@ from sqlalchemy_serializer import SerializerMixin
 from ..db_session import SqlAlchemyBase
 
 
-association_table = Table('contest_to_problem', SqlAlchemyBase.metadata,
-    Column('contest', sqlalchemy.Integer, sqlalchemy.ForeignKey('contests.id')),
-    Column('problem', sqlalchemy.Integer, sqlalchemy.ForeignKey('problems.id'))
-)
-
-
-
 class Problem(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'problems'
 

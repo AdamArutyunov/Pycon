@@ -5,11 +5,11 @@ import sqlalchemy.ext.declarative as dec
 
 SqlAlchemyBase = dec.declarative_base()
 __factory = None
-pycon_scoped_session = None
+__scoped_session = None
 
 def global_init(db_file):
     global __factory
-    global pycon_scoped_session
+    global __scoped_session
 
     if __factory:
         return
@@ -21,8 +21,9 @@ def global_init(db_file):
     print(f"Connecting to database on {conn_str}.")
 
     engine = sa.create_engine(conn_str, echo=False)
+        
     __factory = orm.sessionmaker(bind=engine)
-    pycon_scoped_session = scoped_session(__factory)
+    __scoped_session = scoped_session(__factory)
 
     from . import __all_models
 
@@ -30,10 +31,5 @@ def global_init(db_file):
 
 
 def create_session() -> Session:
-    global __factory
-    return __factory()
-
-
-def create_scoped_session():
-    global pycon_scoped_session
-    return pycon_scoped_session
+    global __scoped_session
+    return __scoped_session

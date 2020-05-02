@@ -161,15 +161,22 @@ label {
   font-size: 12pt;
 }
 
-td {
-  padding: 5px 5px 15px 5px;
+td, th {
+  position: relative;
   vertical-align: top;
   border: none;
 }
 
+th {
+  padding-bottom: 10px;
+  text-align: left;
+  font-weight: bold;
+}
+
 table {
   border: none;
-  border-collapse: collapse;
+  border-spacing: 2vw 20px;
+  margin-left: -2vw;
   width: 100%;
   font-size: 12pt;
 }
@@ -260,6 +267,7 @@ table a {
   border: 1.5px solid var(--light-grey);
   font-size: 13pt;
   padding: 10px;
+  margin-top: 7px;
 }
 
 .register-block {
@@ -307,24 +315,29 @@ table a {
 }
 
 .id-td {
-  max-width: 5%;
+  width: 1px;
+  overflow: visible;
 }
 
 .timestamp-td {
-  max-width: 10%;
+  width: 10%;
 }
 
 .time-td {
-  max-width: 10%;
+  width: 10%;
 }
 
 .memory-td {
-  max-width: 10%;
+ width: 10%;
 }
 
 .verdict-td {
-  float: right;
-  padding-right: 60px;
+  text-align: right;
+  width: 20%;
+}
+
+.solutions-td {
+  width: 1px;
 }
 
 .verdict-neutral {
@@ -337,6 +350,23 @@ table a {
 
 .verdict-good {
   color: #40AA3B;
+}
+
+.problem-status {
+  position: absolute;
+  z-index: -1;
+  width: 36px;
+  height: 36px;
+  left: -58px;
+  top: -9px;
+}
+
+.solved-problem-div {
+  background-color: #C4F2C2;
+}
+
+.unsolved-problem-div {
+  background-color: #F7A5A1;
 }
 
 #limits {
@@ -357,6 +387,13 @@ table a {
 #footer-div {
   height: 30px;
   background-color: var(--primary-color);
+}
+
+#credits {
+  font-size: 10pt;
+  color: #DDD;
+  margin: 10px;
+  text-align: right;
 }
 
 #logo {

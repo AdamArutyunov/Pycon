@@ -93,6 +93,10 @@
     {% else %}
         Чтобы сдать задачу, вам необходимо <a href="/login">войти в систему</a> или <a href="/register">зарегистрироваться</a>.
     {% endif %}
+
+    <div class="normal-block">
+      <a href="/problems/{{problem.id}}/submissions">Мои посылки</a>
+    </div>
   </div>
 
   <script type="text/javascript">

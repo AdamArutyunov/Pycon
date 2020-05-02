@@ -8,6 +8,7 @@ from Constants import *
 
 db_session.global_init(DATABASE_URI)
 session = db_session.create_session()
-submissions = session.query(Submission)
-submissions.delete()
+
+u = session.query(User).get(1)
+
 session.commit()

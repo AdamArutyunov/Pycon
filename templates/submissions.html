@@ -9,6 +9,38 @@
   <div class="content-block">
     {% if submissions %}
       <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="timestamp-td">
+            <span>
+              Дата
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Название
+            </span>
+          </th>
+          <th class="verdict-td">
+            <span>
+              Вердикт
+            </span>
+          </th>
+          <th class="time-td">
+            <span>
+              Время
+            </span>
+          </th>
+          <th class="memory-td">
+            <span>
+              Память
+            </span>
+          </th>
+        </tr>
         {% for submission in submissions %}
           <tr>
             <td class="id-td">

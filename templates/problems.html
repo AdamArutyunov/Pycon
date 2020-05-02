@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Задачи
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if problems %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Название
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Решения
+            </span>
+          </th>
+        </tr>
+        {% for problem in problems %}
+          <tr>
+              <td class="id-td">
+              {% if problem in current_user.solved_problems %}
+                <div class="problem-status solved-problem-div">
+              {% elif problem in current_user.unsolved_problems %}
+                <div class="problem-status unsolved-problem-div">
+              {% endif %}
+              </div>
+              {{ problem.id }}
+            </td>
+            <td class="problemname-td">
+              <a href="/problems/{{ problem.id }}">{{ problem.name }}</a>
+            </td>
+            <td class="solutions-td">
+              {{ problem.users_solved|length }}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}
