@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header" id="contest-header">
+    <h1>
+      {{ contest.name }}
+      {% if current_user.is_authenticated and not current_user.get_contest_association(contest) and not contest.is_started() %}
+        <a href="/contests/{{ contest.id }}/join" class="plus-button">
+          <div>
+            +
+          </div>
+        </a>
+      {% endif %}
+    </h1>
+    <h3 id="limits">
+      <!-- Estimated time -->
+    </h3>
+  </div>
+  {% if not contest.hidden or contest.is_started() or (current_user.is_authenticated and current_user.is_admin()) %}
+    <div class="normal-block">
+      <h3>
+        <a href="/contests/{{ contest.id }}/standings">
+          Положение
+        </a>
+        <br>
+      </h3>
+    </div>
+    <div class="content-block" id="problems-table">
+      {% if contest.problems %}
+        <table class="contest-problems-table">
+          <tr>
+            <th class="id-td">
+              <span>
+                #
+              </span>
+            </th>
+            <th class="problemname-td">
+              <span>
+                Название
+              </span>
+            </th>
+          </tr>
+          {% for problem in contest.problems %}
+            <tr>
+                <td class="id-td">
+                {% if current_user.is_authenticated and current_user.get_contest_association(contest) %}
+                  {% if problem in current_user.solved_problems %}
+                    <div class="problem-status solved-problem-div">
+                  {% elif problem in current_user.unsolved_problems %}
+                    <div class="problem-status unsolved-problem-div">
+                  {% endif %}
+                  </div>
+                {% endif %}
+                {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
+              </td>
+              <td class="problemname-td">
+                <a href="/problems/{{ problem.id }}">{{ problem.name }}</a>
+              </td>
+              {% if current_user.is_authenticated and current_user.is_admin() %}
+                <td class="id-td">
+                  <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete_problem/{{ problem.id }}">
+                    ×
+                  </a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  {% else %}
+    <h3>
+      Задачи и положение участников будут доступны после начала контеста.
+    </h3>
+  {% endif %}
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div class="normal-block" id="admin-features">
+      <a href="/contests/{{ contest.id }}/add_problem" class="list">
+        Добавить задачу
+      </a>
+      <br>
+      <a href="/contests/{{ contest.id }}/edit" class="list">
+        Редактировать контест
+      </a>
+    </div>
+  {% endif %}
+  <script>
+  let contest_start = new Date("{{ contest.start_date }}");
+  let contest_end = new Date("{{ contest.start_date + contest.duration }}");
+  let timecheck_function = function() {
+      let now = new Date().getTime();
+      let end_distance = contest_end - now;
+      let start_distance = contest_start - now;
+
+      let out;
+      if (start_distance > 0) {
+        let hours = Math.floor(start_distance / (1000 * 60 * 60));
+        let minutes = Math.floor((start_distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((start_distance % (1000 * 60)) / 1000);
+        out = `Начало через ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+      else if (end_distance < 0) {
+        out = 'Контест завершён.';
+        clearInterval(countdown_function);
+      } else {
+        let hours = Math.floor(end_distance / (1000 * 60 * 60));
+        let minutes = Math.floor((end_distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((end_distance % (1000 * 60)) / 1000);
+        out = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      document.getElementById("limits").innerHTML = out;
+      document.title = out + " — Контест №{{ contest.id }}";
+  }
+  let countdown_function = setInterval(timecheck_function, 1000);
+  timecheck_function();
+  </script>
+{% endblock %}

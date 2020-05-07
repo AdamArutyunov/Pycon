@@ -1,51 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <form method="post" name="create-problem">
-    <h1>
-      Создать задачу
-    </h1>
+  <h2>
+    Создать задачу
+  </h2>
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
 
-    <div class="content-block">
+    <div class="normal-block">
       <h3>
-        Название
+        {{ form.problem_name.label }}
       </h3>
-      <input type="text" name="problem-name" class="static-input">
+      {{ form.problem_name(class="static-input") }}<br>
+      {% for error in form.problem_name.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
     </div>
 
-    <div class="content-block">
+    <div class="normal-block">
       <h3>
-        Ограничения
+        <label>
+          Ограничения
+        </label>
       </h3>
-      <input type="number" name="time-limit"> с, <input type="number" name="memory-limit"> Мб.
+      {{ form.time_limit(class="ok-so-basically-im-very-smol", type="number") }} с,
+      {{ form.memory_limit(class="ok-so-basically-im-very-smol", type="number") }} Мб.
     </div>
 
-    <div class="content-block">
+    <div class="normal-block">
       <h3>
-        Условие
+        {{ form.situation.label }}
       </h3>
-      <textarea name="description" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+      {{ form.situation(placeholder="Поддерживается HTML.") }}<br>
+      {% for error in form.situation.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
     </div>
 
-    <div class="content-block">
+    <div class="normal-block">
       <h3>
-        Входные данные
+        {{ form.input_data.label }}
       </h3>
-      <textarea name="input-data" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+      {{ form.input_data(placeholder="Поддерживается HTML.") }}<br>
+      {% for error in form.input_data.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
     </div>
 
-    <div class="content-block">
+    <div class="normal-block">
       <h3>
-        Выходные данные
+        {{ form.output_data.label }}
       </h3>
-      <textarea name="output-data" placeholder="Поддерживается HTML." class="static-textarea"></textarea>
+      {{ form.output_data(placeholder="Поддерживается HTML.") }}<br>
+      {% for error in form.output_data.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
     </div>
 
-    <div class="content-block">
-      <h3>Примеры</h3>
-      <input type="text" placeholder="Номера тестов через пробел..." class="static-input">
+    <div class="big-block">
+      {{ form.submit(type="submit", value=action) }}
     </div>
-
-    <input type="submit" value="Создать">
+    <div class="small-block">
+      <p class="alert alert-danger" role="alert">
+        {{message}}
+      </p>
+    </div>
   </form>
 {% endblock %}

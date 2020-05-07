@@ -1,6 +1,9 @@
 import sys
-from time import sleep
-from subprocess import Popen
+import os
+import shutil
+import subprocess
+from time import time
+from random import randint
 from data import db_session
 from data.models.submission import Submission
 from sqlalchemy.orm import scoped_session
@@ -28,6 +31,10 @@ class SolutionChecker:
         session.add(submission)
         session.commit()
 
+    def limit_process_memory(self, bytes_limit):
+        resource.setrlimit(resource.RLIMIT_AS, (bytes_limit, bytes_limit))
+        soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+
     def parse(self):
         session = db_session.create_session()
         while True:
@@ -51,41 +58,59 @@ class SolutionChecker:
         test_solution = submission.data
         submitter = submission.submitter
         problem = submission.problem
-        solution = problem.solution
+        solution = submission.data
         tests = problem.tests
-        
-        sleep(5)  # Temp
+        time_limit = problem.time_limit
+        memory_limit = problem.memory_limit
         
         for test in problem.tests:
+            try:
+                os.mkdir('temp')
+            except Exception:
+                pass
             submission.set_current_test(test)
             session.commit()
             
-            verdict = self.check_test(test, test_solution, solution)
-            if verdict.is_fatal and False:
-                if (problem not in submitter.solved_problems and
-                        problem not in submitter.unsolved_problems):
-                    submitter.unsolved_problems.append(problem)                    
+            verdict = self.check_test(test, solution, time_limit, memory_limit)
+            shutil.rmtree('temp')
+            if verdict.is_fatal:
+                submitter.unsolve_problem(problem)
                 return verdict
 
-        if problem not in submitter.solved_problems:
-            if problem in submitter.unsolved_problems:
-                print(submitter.unsolved_problems)
-                submitter.unsolved_problems.remove(problem)
-            submitter.solved_problems.append(problem)
-
+        submitter.solve_problem(problem)
         return OKVerdict()
 
-    def check_test(self, test, test_solution, solution):
-        sleep(5)  # Temp
-        verdicts = [OKVerdict, CompilationErrorVerdict, RuntimeErrorVerdict,
-                    TimeLimitVerdict, MemoryLimitVerdict, WrongAnswerVerdict]
-        from random import choice, randint
+    def check_test(self, test, solution, time_limit, memory_limit):
+        with open('temp/input.txt', 'w') as f:
+            f.write(test.input_data)
 
-        verdict = choice(verdicts)()
-        verdict.time = randint(100, 2000)
-        verdict.memory = randint(0, 10240)
+        with open('temp/solution.py', 'w') as f:
+            f.write(solution)
 
-        return verdict
+        start_time = time()
+        try:
+            run = subprocess.run(["python", "temp/solution.py"], stdin=open('temp/input.txt'),
+                           stdout=open('temp/output.txt', 'w'), stderr=open('temp/error.txt', 'w'),
+                           timeout=time_limit)
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            run.check_returncode()
+        except subprocess.CalledProcessError as e:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            error = open('temp/error.txt').read().strip().split('\n')[-1].split(':')[0]
+            if error == 'SyntaxError':
+                return CompilationErrorVerdict()
+            return RuntimeErrorVerdict(time=process_time)
+        except subprocess.TimeoutExpired:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            return TimeLimitVerdict(time=process_time)
         
-        
+        with open('temp/output.txt') as f:
+            output = f.read().strip()
+
+        if output == test.output_data:
+            return OKVerdict(time=process_time)
+        return WrongAnswerVerdict(time=process_time)
         

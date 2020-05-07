@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>
+    Создать контест
+  </h2>
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+
+    <div class="normal-block">
+      <h3>
+        {{ form.contest_name.label }}
+      </h3>
+      {{ form.contest_name(class="static-input") }}<br>
+      {% for error in form.contest_name.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.start_date.label }}
+      </h3>
+      {{ form.start_date() }}
+
+      {% for error in form.start_date.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+              {{ form.start_date.data }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.duration.label }}
+      </h3>
+      {{ form.duration(placeholder="В минутах, пожалуйста!", class="static-input") }}<br>
+      {% for error in form.duration.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      {{ form.hidden }}
+      {{ form.hidden.label }}
+    </div>
+
+    <div class="big-block">
+      {{ form.submit(type="submit", value=action) }}
+    </div>
+    <div class="small-block">
+      <p class="alert alert-danger" role="alert">
+        {{message}}
+      </p>
+    </div>
+  </form>
+{% endblock %}

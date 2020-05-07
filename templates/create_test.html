@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>
+    Создать тест
+  </h2>
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+
+    <div class="normal-block">
+      <h3>
+        {{ form.input_data.label }}
+      </h3>
+      {{ form.input_data }}<br>
+      {% for error in form.input_data.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.output_data.label }}
+      </h3>
+      {{ form.output_data }}<br>
+      {% for error in form.output_data.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      {{ form.example }}
+      {{ form.example.label }}
+    </div>
+
+    <div class="big-block">
+      {{ form.submit(type="submit") }}
+    </div>
+    <div class="small-block">
+      <p class="alert alert-danger" role="alert">
+        {{message}}
+      </p>
+    </div>
+  </form>
+{% endblock %}

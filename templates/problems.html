@@ -48,4 +48,11 @@
       </table>
     {% endif %}
   </div>
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div class="normal-block" id="admin-features">
+      <a href="/problems/create" class="list">
+        Создать задачу
+      </a>
+    </div>
+  {% endif %}
 {% endblock %}

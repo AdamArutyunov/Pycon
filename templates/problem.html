@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="content-header">
+  <div class="content-header" id="problem-header">
     <h1>
       {{ problem.name }}
     </h1>
@@ -9,11 +9,11 @@
       {{ problem.time_limit }} с, {{ problem.memory_limit }} Мб.
     </h3>
   </div>
-  <div class="content-block">
+  <div class="content-block" id="situation">
     {{ problem.situation|safe }}
   </div>
   {% if problem.input_data %}
-    <div class="content-block">
+    <div class="content-block" id="input-data">
       <h3>
         Входные данные
       </h3>
@@ -21,7 +21,7 @@
     </div>
   {% endif %}
   {% if problem.output_data %}
-    <div class="content-block">
+    <div class="content-block" id="output-data">
       <h3>
         Выходные данные
       </h3>
@@ -29,7 +29,7 @@
     </div>
   {% endif %}
   {% if problem.examples %}
-    <div class="content-block">
+    <div class="content-block" id="examples">
       <h3>
         Примеры
       </h3>
@@ -40,7 +40,7 @@
               Входные данные
             </span>
             <div class="data-box">
-              {{ example.input_data|safe }}
+              {{ example.input_data|replace('\n', '<br>')|safe }}
             </div>
           </div>
           <div class="example-output">
@@ -48,14 +48,14 @@
               Выходные данные
             </span>
             <div class="data-box">
-              {{ example.output_data|safe }}
+              {{ example.output_data|replace('\n', '<br>')|safe }}
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
   {% endif %}
-  <div class="content-block">
+  <div class="content-block" id="send">
     <h3>
       Сдать
     </h3>
@@ -90,13 +90,27 @@
           </div>
         </form>
       </div>
+      <div class="normal-block" id="my-submissions">
+        <a href="/problems/{{problem.id}}/submissions">Мои посылки</a>
+      </div>
     {% else %}
-        Чтобы сдать задачу, вам необходимо <a href="/login">войти в систему</a> или <a href="/register">зарегистрироваться</a>.
+        Чтобы сдать задачу, нужно <a href="/login?next=/problems/{{ problem.id }}#send">войти в систему</a> или <a href="/registernext=/problems/{{ problem.id }}#send">зарегистрироваться</a>.
     {% endif %}
-
-    <div class="normal-block">
-      <a href="/problems/{{problem.id}}/submissions">Мои посылки</a>
-    </div>
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+      <div class="normal-block" id="admin-features">
+        <a href="/problems/{{problem.id}}/tests" class="list">
+          Посмотреть тесты
+        </a>
+        <br>
+        <a href="/problems/{{problem.id}}/edit" class="list">
+          Редактировать задачу
+        </a>
+        <br>
+        <a href="/problems/{{ problem.id }}/delete" class="alert-danger list">
+          Удалить задачу
+        </a>
+      </div>
+    {% endif %}
   </div>
 
   <script type="text/javascript">

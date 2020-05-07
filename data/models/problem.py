@@ -14,9 +14,18 @@ class Problem(SqlAlchemyBase, SerializerMixin):
     situation = Column(String, nullable=False)
     input_data = Column(String, nullable=True)
     output_data = Column(String, nullable=True)
-    solution = Column(String, nullable=False)
     tests = orm.relation("Test", back_populates='problem')
     time_limit = Column(Integer, nullable=True)
     memory_limit = Column(Integer, nullable=True)
+
+    @property
+    def users_solved(self):
+        return list(map(lambda x: x.user, filter(lambda x: x.solved, self.users)))
     
-    
+    @property
+    def users_unsolved(self):
+        return list(map(lambda x: x.user, filter(lambda x: not x.solved, self.users)))
+
+    @property
+    def examples(self):
+        return list(filter(lambda x: x.example, self.tests))

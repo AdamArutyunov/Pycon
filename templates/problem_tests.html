@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header" id="problem-header">
+    <h3>
+      Тесты <a href="/problems/{{ problem.id }}">задачи №{{ problem.id }}</a>
+    </h3>
+  </div>
+  <div class="content-block">
+    <a href="/problems/{{ problem.id }}/create_test">
+      Создать тест
+    </a>
+  </div>
+  {% if problem.tests %}
+    <div class="content-block" id="tests">
+      {% for test in problem.tests %}
+        <h4>
+          #{{ test.number }}
+          <a class="alert-danger delete-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/delete">
+            ×
+          </a>
+        </h4>
+        <div class="example">
+          <div class="example-input">
+            <span class="small-grey-label">
+              Входные данные
+            </span>
+            <div class="data-box">
+              {{ test.input_data|replace('\n', '<br>')|safe }}
+            </div>
+          </div>
+          <div class="example-output">
+            <span class="small-grey-label">
+              Выходные данные
+            </span>
+            <div class="data-box">
+              {{ test.output_data|replace('\n', '<br>')|safe }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,6 +1,8 @@
 from data import db_session
 from data.models.test import Test
 from data.models.problem import Problem
+from data.models.contest import Contest
+import datetime
 
 db_session.global_init("data/database/main.db")
 session = db_session.create_session()
@@ -42,3 +44,32 @@ session.add(test1)
 session.add(test2)
 session.add(problem)
 session.commit()
+
+
+problem = Problem()
+problem.name = "Тестовая задача"
+problem.situation = '123'
+problem.time_limit = 4
+problem.memory_limit = 64
+session.add(problem)
+session.commit()
+
+problem = Problem()
+problem.name = "Тестовая задача 2"
+problem.situation = '456'
+problem.time_limit = 4
+problem.memory_limit = 64
+session.add(problem)
+session.commit()
+
+
+contest = Contest()
+contest.name = 'Тестовый контест'
+for problem in session.query(Problem).all():
+    contest.problems.append(problem)
+
+contest.start_date = datetime.datetime.now() + datetime.timedelta(minutes=30)
+contest.duration = datetime.timedelta(hours=3)
+session.add(contest)
+session.commit()
+

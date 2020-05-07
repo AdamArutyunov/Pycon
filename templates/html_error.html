@@ -2,10 +2,9 @@
 
 {% block content %}
   <span class="big-fucking-span primary-span">
-    404
+    {{ error_id }}
   </span>
-  <h3>
-    Такой страницы нет! Но есть много других.
-  </h3>
+  <br>
+  {{ message }}
   <a href="/">Вернуться на главную</a>
 {% endblock %}

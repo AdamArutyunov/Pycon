@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Контесты
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if contests %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Название
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Начало
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Длительность
+            </span>
+          </th>
+        </tr>
+        {% for contest in contests %}
+          <tr {{ "class=inactive-contest" if contest.is_finished() }}>
+            <td class="id-td">
+              {{ contest.id }}
+            </td>
+            <td class="problemname-td">
+              <a href="/contests/{{ contest.id }}">{{ contest.name }}</a>
+            </td>
+            <td class="id-td">
+              {{ contest.start_date.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
+            </td>
+            <td class="id-td">
+              {{ contest.duration.__str__() }}
+            </td>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete">
+                  ×
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div class="normal-block" id="admin-features">
+      <a href="/contests/create" class="list">
+        Создать контест
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}

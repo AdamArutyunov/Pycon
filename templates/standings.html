@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header" id="standings-header">
+    <h2>
+      Положение
+      <a href="/contests/{{ contest.id }}">
+        контеста
+      </a>
+    </h2>
+  </div>
+  <div class="content-block" id="standings-table">
+    {% if contest.participants %}
+      <table class="contest-problems-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Имя
+            </span>
+          </th>
+          <th class="id-td central-td">
+            <span>
+              =
+            </span>
+          </th>
+          {% for problem in contest.problems %}
+            <th class="id-td central-td">
+              <a href="/problems/{{ problem.id }}">
+                {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
+              </a>
+            </th>
+          {% endfor %}
+        </tr>
+        {% for association in standings %}
+          {% set user = association.user %}
+          <tr>
+            <td class="id-td">
+               <span>
+                 {{ loop.index }}
+                </span>
+            </td>
+            <td class="problemname-td">
+              <span>
+                {{ user.login }}
+              </span>
+            </td>
+            <td class="id-td central-td">
+              <span>
+                {{ user.get_solved_contest_problems_count(contest) }}
+              </span>
+            </td>
+            {% for problem in contest.problems %}
+              <td class="id-td central-td">
+                {% set upa = user.get_problem_association(problem) %}
+                {% if upa %}
+                  {% if upa.solved == True %}
+                    <span class="verdict-good">
+                      <b>
+                        +{{ upa.submissions if upa.submissions > 1 }}
+                      </b>
+                    </span>
+                  {% else %}
+                    <span class="verdict-bad">
+                      <b>
+                        -{{ upa.submissions }}
+                      </b>
+                    </span>
+                  {% endif %}
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      А участников-то и нет!
+    {% endif %}
+  </div>
+
+  <script>
+  let contest_start = new Date("{{ contest.start_date }}");
+  let contest_end = new Date("{{ contest.start_date + contest.duration }}");
+  let timecheck_function = function() {
+      let now = new Date().getTime();
+      let end_distance = contest_end - now;
+      let start_distance = contest_start - now;
+
+      let out;
+      if (start_distance > 0) {
+        let hours = Math.floor(start_distance / (1000 * 60 * 60));
+        let minutes = Math.floor((start_distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((start_distance % (1000 * 60)) / 1000);
+        out = `Начало через ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+      else if (end_distance < 0) {
+        out = 'Контест завершён.';
+        clearInterval(countdown_function);
+      } else {
+        let hours = Math.floor(end_distance / (1000 * 60 * 60));
+        let minutes = Math.floor((end_distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((end_distance % (1000 * 60)) / 1000);
+        out = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      document.title = out + " — Контест №{{ contest.id }}";
+  }
+  let countdown_function = setInterval(timecheck_function, 1000);
+  timecheck_function();
+  </script>
+{% endblock %}
