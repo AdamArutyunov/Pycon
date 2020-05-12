@@ -248,7 +248,7 @@ def delete_problem_test(problem_id, test_id):
 
     session.commit()
 
-    return redirect(f'/problems/{problem_id}')
+    return redirect(f'/problems/{problem_id}/tests')
 
 
 @app.route('/contests/create', methods=["GET", "POST"])

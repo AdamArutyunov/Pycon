@@ -10,14 +10,14 @@
     </h3>
   </div>
   <div class="content-block" id="situation">
-    {{ problem.situation|safe }}
+    {{ problem.situation|replace('\n', '<br>')|safe }}
   </div>
   {% if problem.input_data %}
     <div class="content-block" id="input-data">
       <h3>
         Входные данные
       </h3>
-      {{ problem.input_data|safe }}
+      {{ problem.input_data|replace('\n', '<br>')|safe }}
     </div>
   {% endif %}
   {% if problem.output_data %}
@@ -25,7 +25,7 @@
       <h3>
         Выходные данные
       </h3>
-      {{ problem.output_data|safe }}
+      {{ problem.output_data|replace('\n', '<br>')|safe }}
     </div>
   {% endif %}
   {% if problem.examples %}
