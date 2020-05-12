@@ -43,6 +43,13 @@
             <td class="solutions-td">
               {{ problem.users_solved|length }}
             </td>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/problems/{{ problem.id }}/delete">
+                  ×
+                </a>
+              </td>
+            {% endif %}
           </tr>
         {% endfor %}
       </table>
