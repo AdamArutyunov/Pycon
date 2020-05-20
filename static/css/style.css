@@ -294,6 +294,8 @@ table a {
   font-size: 13pt;
   padding: 10px;
   margin-top: 7px;
+  white-space: nowrap;
+  overflow: scroll;
 }
 
 .register-block {

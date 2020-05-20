@@ -1,5 +1,6 @@
 import sys
 import datetime
+import os
 from flask import Flask, render_template, abort, redirect, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from multiprocessing import Process
@@ -465,5 +466,6 @@ def logout():
 
 if __name__ == '__main__':
     db_session.global_init(app.config['DATABASE_URI'])
+    os.chdir('/home/rostselmash/flask')
     PyconSolutionCheckerProcess.start()
-    app.run(port=8080, host='127.0.0.1')
+    app.run(port=443, host='0.0.0.0')

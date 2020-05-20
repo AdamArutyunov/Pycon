@@ -11,17 +11,17 @@ from ..db_session import SqlAlchemyBase
 class UserToContest(SqlAlchemyBase):
     __tablename__ = 'user_to_contest'
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    user = orm.relation('User', back_populates='contests')
+    user = orm.relation('User', backref=orm.backref('contests', lazy='joined', cascade='all'))
     contest_id = Column(Integer, ForeignKey('contests.id'), primary_key=True)
-    contest = orm.relation('Contest', backref='participants')
+    contest = orm.relation('Contest', backref=orm.backref('participants', lazy='joined', cascade='all'))
 
 
 class UserToProblem(SqlAlchemyBase):
     __tablename__ = 'user_to_problem'
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    user = orm.relation('User', back_populates='problems')
+    user = orm.relation('User', backref=orm.backref('problems', lazy='joined', cascade='all'))
     problem_id = Column(Integer, ForeignKey('problems.id'), primary_key=True)
-    problem = orm.relation('Problem', backref='users')
+    problem = orm.relation('Problem', backref=orm.backref('users', lazy='joined', cascade='all'))
     solved = Column(Boolean, nullable=False)
     submissions = Column(Integer, default=1)
 
@@ -35,8 +35,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = Column(String, nullable=True)
     role = Column(Integer, default=0)
     submissions = orm.relation("Submission", back_populates='submitter')
-    problems = orm.relation('UserToProblem', back_populates='user')
-    contests = orm.relation('UserToContest', back_populates='user')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

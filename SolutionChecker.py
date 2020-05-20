@@ -17,6 +17,7 @@ class SolutionChecker:
         self.queue = []
         db_session.global_init(DATABASE_URI)
         db_session.create_session()
+        os.chdir('/home/rostselmash/flask/')
 
     def submit(self, problem, data):
         session = db_session.create_session()
@@ -62,17 +63,11 @@ class SolutionChecker:
         tests = problem.tests
         time_limit = problem.time_limit
         memory_limit = problem.memory_limit
-        
         for test in problem.tests:
-            try:
-                os.mkdir('temp')
-            except Exception:
-                pass
             submission.set_current_test(test)
             session.commit()
             
             verdict = self.check_test(test, solution, time_limit, memory_limit)
-            shutil.rmtree('temp')
             if verdict.is_fatal:
                 submitter.unsolve_problem(problem)
                 return verdict
@@ -81,16 +76,16 @@ class SolutionChecker:
         return OKVerdict()
 
     def check_test(self, test, solution, time_limit, memory_limit):
-        with open('temp/input.txt', 'w') as f:
+        with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
 
-        with open('temp/solution.py', 'w') as f:
+        with open('temp/solution.py', 'w+') as f:
             f.write(solution)
 
         start_time = time()
         try:
-            run = subprocess.run(["python", "temp/solution.py"], stdin=open('temp/input.txt'),
-                           stdout=open('temp/output.txt', 'w'), stderr=open('temp/error.txt', 'w'),
+            run = subprocess.run(["python3.6", "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
+                           stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
                            timeout=time_limit)
             end_time = time()
             process_time = int((end_time - start_time) * 1000)

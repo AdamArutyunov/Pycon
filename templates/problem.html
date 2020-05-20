@@ -94,7 +94,7 @@
         <a href="/problems/{{problem.id}}/submissions">Мои посылки</a>
       </div>
     {% else %}
-        Чтобы сдать задачу, нужно <a href="/login?next=/problems/{{ problem.id }}#send">войти в систему</a> или <a href="/registernext=/problems/{{ problem.id }}#send">зарегистрироваться</a>.
+        Чтобы сдать задачу, нужно <a href="/login?next=/problems/{{ problem.id }}#send">войти в систему</a> или <a href="/register?next=/problems/{{ problem.id }}#send">зарегистрироваться</a>.
     {% endif %}
     {% if current_user.is_authenticated and current_user.is_admin() %}
       <div class="normal-block" id="admin-features">
