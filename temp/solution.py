@@ -1,1 +1,2 @@
-sdsdf
+while True:
+  pass

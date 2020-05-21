@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% set verdict_labels = {"RE": "Ошибка исполнения",
+                         "CE": "Ошибка компиляции",
+                         "WA": "Неправильный ответ",
+                         "TL": "Превышение лимита времени",
+                         "ML": "Превышение лимита памяти"} %}
+
 {% block content %}
   <div class="content-header">
     <h2>
@@ -70,7 +76,7 @@
                   {{ submission.verdict }}
                 </span>
               {% else %}
-                <span class="verdict-bad">
+                <span class="verdict-bad" title="{{ verdict_labels[submission.verdict] }}"">
                   {{ submission.verdict }} #{{ submission.test }}
                 </span>
               {% endif %}

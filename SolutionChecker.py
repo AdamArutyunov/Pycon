@@ -17,7 +17,7 @@ class SolutionChecker:
         self.queue = []
         db_session.global_init(DATABASE_URI)
         db_session.create_session()
-        os.chdir('/home/rostselmash/flask/')
+        os.chdir(APP_ROOT)
 
     def submit(self, problem, data):
         session = db_session.create_session()
@@ -84,7 +84,7 @@ class SolutionChecker:
 
         start_time = time()
         try:
-            run = subprocess.run(["python3.6", "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
+            run = subprocess.run([PYTHON_COMMAND, "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
                            stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
                            timeout=time_limit)
             end_time = time()

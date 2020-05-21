@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "temp/solution.py", line 1, in <module>
-    sdsdf
-NameError: name 'sdsdf' is not defined

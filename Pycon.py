@@ -200,14 +200,20 @@ def delete_problem(problem_id):
     return redirect('/problems')
 
 
-@app.route('/submissions')
+@app.route('/raw_submissions')
 @login_required
-def submissions():
+def raw_submissions():
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
     return render_template('submissions.html', title="Посылки",
                            submissions=submissions)
+
+
+@app.route('/submissions')
+@login_required
+def submissions():
+    return render_template('submissions_ajax.html')
 
 
 @app.route('/problems/<int:problem_id>/submissions')
@@ -466,6 +472,6 @@ def logout():
 
 if __name__ == '__main__':
     db_session.global_init(app.config['DATABASE_URI'])
-    os.chdir('/home/rostselmash/flask')
+    os.chdir(APP_ROOT)
     PyconSolutionCheckerProcess.start()
-    app.run(port=443, host='0.0.0.0')
+    app.run(port=APP_PORT, host='0.0.0.0')
