@@ -1,2 +1,4 @@
 /data/database/*
 /Constants.py
+__pycache__/
+/temp/
