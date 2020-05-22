@@ -1,7 +1,8 @@
 import sys
 import datetime
 import os
-from flask import Flask, render_template, abort, redirect, request
+import csv
+from flask import Flask, render_template, abort, redirect, request, send_file
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from multiprocessing import Process
 from functools import wraps
@@ -386,6 +387,50 @@ def contest_standings(contest_id):
     return render_template('standings.html', title=f"Результаты контеста №{contest_id}",
                            contest=contest, standings=standings)
 
+
+@app.route('/contests/<int:contest_id>/standings/csv')
+@login_required
+@admin_required
+def contest_standings_csv(contest_id):
+    session = db_session.create_session()
+    standings = []
+    
+    contest = session.query(Contest).get(contest_id)
+    if not contest:
+        abort(404)
+
+    standings = sorted(contest.participants,
+                       key=lambda x: -x.user.get_solved_contest_problems_count(contest))
+
+    data = [['', 'Логин', 'Почта', '=', *list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')[:len(contest.problems)]]]
+
+    for i, association in enumerate(standings):
+        user = association.user
+        
+        row = [i + 1, user.login, user.email,
+               user.get_solved_contest_problems_count(contest)]
+        
+        for problem in contest.problems:
+            upa = user.get_problem_association(problem)
+            if upa:
+                if upa.solved:
+                    row.append('+')
+                else:
+                    row.append('-')
+            else:
+                row.append('')
+
+        data.append(row)
+
+    with open('temp/standings.csv', 'w', newline='') as f:
+        writer = csv.writer(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for row in data:
+            writer.writerow(row)
+
+    return send_file('temp/standings.csv', as_attachment=True,
+                     attachment_filename=f'{contest.id}_standings.csv',
+                     cache_timeout=-1)
+        
 
 @app.route('/contests/<int:contest_id>/delete_problem/<int:problem_id>')
 @login_required

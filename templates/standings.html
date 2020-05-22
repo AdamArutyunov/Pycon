@@ -58,7 +58,7 @@
               <td class="id-td central-td">
                 {% set upa = user.get_problem_association(problem) %}
                 {% if upa %}
-                  {% if upa.solved == True %}
+                  {% if upa.solved %}
                     <span class="verdict-good">
                       <b>
                         +{{ upa.submissions if upa.submissions > 1 }}
@@ -77,6 +77,13 @@
           </tr>
         {% endfor %}
       </table>
+      {% if current_user.is_authenticated and current_user.is_admin() %}
+        <div class="content-block">
+          <a href="/contests/{{ contest.id }}/standings/csv">
+            Скачать CSV
+          </a>
+        </div>
+      {% endif %}
     {% else %}
       А участников-то и нет!
     {% endif %}
