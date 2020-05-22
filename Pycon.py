@@ -422,7 +422,7 @@ def contest_standings_csv(contest_id):
 
         data.append(row)
 
-    with open('temp/standings.csv', 'w', newline='') as f:
+    with open('temp/standings.csv', 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for row in data:
             writer.writerow(row)
