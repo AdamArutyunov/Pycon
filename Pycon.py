@@ -173,8 +173,8 @@ def create_test(problem_id):
     if form.validate_on_submit():
         test = Test()
         test.number = len(problem.tests) + 1
-        test.input_data = form.input_data.data
-        test.output_data = form.output_data.data
+        test.input_data = form.input_data.data.replace('\r', '')
+        test.output_data = form.output_data.data.replace('\r', '')
         test.example = form.example.data
         test.problem = problem
 
