@@ -11,7 +11,7 @@ db_session.global_init(DATABASE_URI)
 session = db_session.create_session()
 
 
-u = session.query(User).get(1)
+u = session.query(User).get(3)
 u.role = 1
 
 session.commit()
