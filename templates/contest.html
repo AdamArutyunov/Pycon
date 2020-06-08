@@ -89,8 +89,8 @@
     </div>
   {% endif %}
   <script>
-  let contest_start = new Date("{{ contest.start_date }}");
-  let contest_end = new Date("{{ contest.start_date + contest.duration }}");
+  let contest_start = new Date("{{ contest.start_date }}Z");
+  let contest_end = new Date("{{ contest.start_date + contest.duration }}Z");
   let timecheck_function = function() {
       let now = new Date();
       now = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
