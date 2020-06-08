@@ -211,6 +211,17 @@ def raw_submissions():
                            submissions=submissions)
 
 
+@app.route('/all_submissions')
+@login_required
+@admin_required
+def all_submissions():
+    session = db_session.create_session()
+    submissions = session.query(Submission)\
+                  .order_by(Submission.id.desc()).all()
+    return render_template('submissions.html', title="Все посылки",
+                           submissions=submissions)
+
+
 @app.route('/submissions')
 @login_required
 def submissions():
@@ -237,7 +248,7 @@ def problem_tests(problem_id):
     if not problem:
         abort(404)
 
-    return render_template('problem_tests.html', title=f"Тесты проблемы №{problem_id}",
+    return render_template('problem_tests.html', title=f"Тесты задачи №{problem_id}",
                            problem=problem)
 
 @app.route('/problems/<int:problem_id>/tests/<int:test_id>/delete')

@@ -30,6 +30,11 @@
               Длительность
             </span>
           </th>
+          <th class="solutions-td">
+            <span>
+              Участников
+            </span>
+          </th>
         </tr>
         {% for contest in contests %}
           <tr {{ "class=inactive-contest" if contest.is_finished() }}>
@@ -52,6 +57,9 @@
                 </a>
               </td>
             {% endif %}
+            <td class="id-td">
+              {{ contest.participants|length }}
+            </td>
           </tr>
         {% endfor %}
       </table>
