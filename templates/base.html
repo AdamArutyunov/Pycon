@@ -23,7 +23,10 @@
           let dct = {
             '/': "Главная",
             '/problems': "Задачи",
-            '/contests': "Контесты"
+            '/contests': "Контесты",
+            '/raw_submissions': "Мои посылки"
+            {% if current_user.is_authenticated and current_user.is_admin() %},
+            '/all_submissions': "Все посылки" {% endif %}
           }
 
           for (var key in dct) {

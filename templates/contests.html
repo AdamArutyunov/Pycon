@@ -50,6 +50,9 @@
             <td class="id-td">
               {{ contest.duration.__str__() }}
             </td>
+            <td class="id-td">
+              {{ contest.participants|length }}
+            </td>
             {% if current_user.is_authenticated and current_user.is_admin() %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete">
@@ -57,9 +60,6 @@
                 </a>
               </td>
             {% endif %}
-            <td class="id-td">
-              {{ contest.participants|length }}
-            </td>
           </tr>
         {% endfor %}
       </table>

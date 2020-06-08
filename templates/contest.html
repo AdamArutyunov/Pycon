@@ -4,7 +4,7 @@
   <div class="content-header" id="contest-header">
     <h1>
       {{ contest.name }}
-      {% if current_user.is_authenticated and not current_user.get_contest_association(contest) and not contest.is_started() %}
+      {% if current_user.is_authenticated and not current_user.get_contest_association(contest) and not contest.is_finished() %}
         <a href="/contests/{{ contest.id }}/join" class="plus-button">
           <div>
             +
@@ -92,7 +92,8 @@
   let contest_start = new Date("{{ contest.start_date }}");
   let contest_end = new Date("{{ contest.start_date + contest.duration }}");
   let timecheck_function = function() {
-      let now = new Date().getTime();
+      let now = new Date();
+      now = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
       let end_distance = contest_end - now;
       let start_distance = contest_start - now;
 

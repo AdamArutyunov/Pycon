@@ -106,7 +106,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def join_contest(self, contest):
         contests = list(map(lambda x: x.contest, self.contests))
-        if contest in contests or contest.is_started():
+        if contest in contests or contest.is_finished():
             return
         
         contest_association = UserToContest()
