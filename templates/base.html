@@ -1,59 +1,84 @@
 <!doctype html>
 <html lang="en">
   <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <link rel="stylesheet" type="text/css" href="/static/css/style.css">
-      <link href="/static/css/codemirror.css" rel="stylesheet">
-      <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
-      <script src="/static/js/codemirror.js"></script>
-      <script src="/static/js/python.js"></script>
-      <title>{{title}}</title>
-  </head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link href="/static/css/codemirror.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <script src="/static/js/codemirror.js"></script>
+    <script src="/static/js/python.js"></script>
+    <title>{{title}}</title>
+    </head>
 <body>
   <header>
-      <a href="/" style="border: none;">
-        <div id="logo">
-          <img src="/static/img/logo.png">
-        </div>
-      </a>
-      <div id="header-links">
-        <script>
-          let path = document.location.pathname;
-          let dct = {
-            '/': "Главная",
-            '/problems': "Задачи",
-            '/contests': "Контесты",
-            '/raw_submissions': "Мои посылки"
-            {% if current_user.is_authenticated and current_user.is_admin() %},
-            '/all_submissions': "Все посылки" {% endif %}
+    <a href="/" style="border: none;">
+      <div id="logo">
+        <img src="/static/img/logo.png">
+      </div>
+    </a>
+    <div id="header-links">
+      <script>
+        let path = document.location.pathname;
+        let dct = {
+        'links': {
+          '/': "Главная",
+          '/problems': "Задачи",
+          '/contests': "Контесты",
+          '/raw_submissions': "Мои посылки"
+        },
+
+        'admin_links':
+          {
+            '/all_submissions': "Все посылки",
+            '/groups': "Группы"
+          }
+        }
+
+        for (var key in dct['links']) {
+          document.write("<div class='link-wrapper'>")
+          let value = dct['links'][key]
+
+          if (path == key) {
+            document.write(value);
+          } else {
+            document.write(`<a href='${key}'>${value}</a>`);
           }
 
-          for (var key in dct) {
-            let value = dct[key];
+          document.write("</div>")
+        }
+
+        document.write('<br>')
+
+        {% if current_user.is_authenticated and current_user.is_admin() %}
+          for (var key in dct['admin_links']) {
             document.write("<div class='link-wrapper'>")
+            let value = dct['admin_links'][key];
+
             if (path == key) {
-              document.write(value + "<br>");
+              document.write(value);
             } else {
-              document.write(`<a href='${key}'>${value}</a><br>`);
+              document.write(`<a href='${key}' class='alert-warning'>${value}</a>`);
             }
             document.write("</div>")
           }
-        </script>
-      </div>
-      <div id="login-block">
-        {% if current_user.is_authenticated %}
-          Вы вошли как <b>{{ current_user.login }}</b><br>
-          <script>
-            document.write(`<a href="/logout?next=${path}">Выйти</a><br>`)
-          </script>
-        {% else %}
-          <script>
-            document.write(`<a href="/login?next=${path}">Войти</a><br>`)
-          </script>
-          <a href="/register">Зарегистрироваться</a>
         {% endif %}
-      </div>
+
+      </script>
+    </div>
+    <div id="login-block">
+      {% if current_user.is_authenticated %}
+        Вы вошли как <b>{{ current_user.login }}</b><br>
+        <script>
+          document.write(`<a href="/logout?next=${path}">Выйти</a><br>`)
+        </script>
+      {% else %}
+        <script>
+          document.write(`<a href="/login?next=${path}">Войти</a><br>`)
+        </script>
+        <a href="/register">Зарегистрироваться</a>
+      {% endif %}
+    </div>
   </header>
   <main role="main" id="main">
       {% block content %}{% endblock %}

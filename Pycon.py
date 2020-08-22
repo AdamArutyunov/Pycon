@@ -8,6 +8,7 @@ from multiprocessing import Process
 from functools import wraps
 from data import db_session
 from data.models.contest import *
+from data.models.group import *
 from data.models.problem import *
 from data.models.submission import *
 from data.models.test import *
@@ -159,6 +160,7 @@ def edit_problem(problem_id):
 
     return render_template('create_problem.html', title=f"Редактирование задачи №{problem_id}",
                            form=form, action="Сохранить")
+
 
 @app.route('/problems/<int:problem_id>/create_test', methods=["GET", "POST"])
 @login_required
@@ -475,11 +477,23 @@ def join_contest(contest_id):
     return redirect(f'/contests/{contest_id}')
 
 
+@app.route('/groups')
+@login_required
+@admin_required
+def groups():
+    session = db_session.create_session()
+    groups = session.query(Group).order_by(Group.id).all()
+    return render_template('groups.html', title="Группы",
+                           groups=groups)
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    session = db_session.create_session()
+    form.group.choices += [(group.id, group.name) for group in session.query(Group).all()]
+
     if form.validate_on_submit():
-        session = db_session.create_session()
         if session.query(User).filter(User.login == form.login.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -491,6 +505,7 @@ def register():
         user = User()
         user.login = form.login.data
         user.email = form.email.data
+        user.group = session.query(Group).get(form.group.data)
         user.set_password(form.password.data)
         
         session.add(user)
@@ -521,13 +536,12 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    current_user
     logout_user()
     return redirect(request.args.get('next') or '/')
 
 
 if __name__ == '__main__':
-    db_session.global_init(app.config['DATABASE_URI'])
     os.chdir(APP_ROOT)
+    db_session.global_init(app.config['DATABASE_URI'])
     PyconSolutionCheckerProcess.start()
     app.run(port=APP_PORT, host='0.0.0.0')

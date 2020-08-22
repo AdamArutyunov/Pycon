@@ -33,6 +33,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     login = Column(String, nullable=True)
     email = Column(String, index=True, unique=True, nullable=False)
     hashed_password = Column(String, nullable=True)
+    group_id = Column(Integer, ForeignKey('groups.id'))
+    group = orm.relation('Group')
     role = Column(Integer, default=0)
     submissions = orm.relation("Submission", back_populates='submitter')
 

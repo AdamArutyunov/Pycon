@@ -33,6 +33,15 @@
               </p>
           {% endfor %}
       </div>
+      <div class="small-block">
+          {{ form.group.label(class="normal-grey-label") }}<br>
+          {{ form.group() }}<br>
+          {% for error in form.password.errors %}
+              <p class="alert alert-danger" role="alert">
+                  {{ error }}
+              </p>
+          {% endfor %}
+      </div>
       <div class="big-block">
         {{ form.submit(type="submit") }}
       </div>

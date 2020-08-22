@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Группы
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if groups %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Название
+            </span>
+          </th>
+        </tr>
+        {% for group in groups %}
+          <tr>
+            <td class="id-td">
+              {{ group.id }}
+            </td>
+            <td class="problemname-td">
+              <a href="/groups/{{ group.id }}">{{ group.name }}</a>
+            </td>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/groups/{{ group.id }}/delete">
+                  ×
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div class="normal-block" id="admin-features">
+      <a href="/groups/create" class="list">
+        Создать группу
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}
