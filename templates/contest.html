@@ -58,7 +58,7 @@
               </td>
               {% if current_user.is_authenticated and current_user.is_admin() %}
                 <td class="id-td">
-                  <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete_problem/{{ problem.id }}">
+                  <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/remove_problem/{{ problem.id }}">
                     ×
                   </a>
                 </td>

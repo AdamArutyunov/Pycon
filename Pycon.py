@@ -21,6 +21,7 @@ from forms.create_test import CreateTestForm
 from forms.create_contest import CreateContestForm
 from forms.contest_add_problem import ContestAddProblemForm
 from forms.create_group import CreateGroupForm
+from forms.group_add_user import GroupAddUserForm
 from SolutionChecker import SolutionChecker
 from Constants import *
 
@@ -32,7 +33,6 @@ app.config['DATABASE_URI'] = DATABASE_URI
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
 
 PyconSolutionChecker = SolutionChecker()
 PyconSolutionCheckerProcess = Process(target=PyconSolutionChecker.parse)
@@ -448,10 +448,10 @@ def contest_standings_csv(contest_id):
                      cache_timeout=-1)
         
 
-@app.route('/contests/<int:contest_id>/delete_problem/<int:problem_id>')
+@app.route('/contests/<int:contest_id>/remove_problem/<int:problem_id>')
 @login_required
 @admin_required
-def delete_contest_problem(contest_id, problem_id):
+def contest_remove_problem(contest_id, problem_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
     problem = session.query(Problem).get(problem_id)
@@ -560,6 +560,51 @@ def delete_group(group_id):
     session.commit()
 
     return redirect('/groups')
+
+
+@app.route('/groups/<int:group_id>/add_user', methods=["GET", "POST"])
+@login_required
+@admin_required
+def group_add_user(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    if not group:
+        abort(404)
+
+    form = GroupAddUserForm()
+    if form.validate_on_submit():
+        user_id = form.user_id.data
+        user = session.query(User).get(user_id)
+        if not user:
+            return render_template('group_add_user.html',
+                                   title=f"Добавить пользователя в группу \"{group.name}\"",
+                                   form=form,
+                                   message="Пользователя с таким ID нет.")
+
+        group.add_user(user)
+        session.commit()
+        return redirect(f'/groups/{group_id}')
+
+    return render_template('group_add_user.html',
+                           title=f"Добавить пользователя в группу \"{group.name}\"",
+                           form=form)
+
+
+@app.route('/groups/<int:group_id>/remove_user/<int:user_id>')
+@login_required
+@admin_required
+def group_remove_user(group_id, user_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    user = session.query(User).get(user_id)
+
+    if not group or not user:
+        abort(404)
+
+    group.remove_user(user)
+
+    session.commit()
+    return redirect(f'/groups/{group_id}')
 
 
 @app.route('/register', methods=['GET', 'POST'])
