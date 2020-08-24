@@ -20,6 +20,7 @@ from forms.create_problem import CreateProblemForm
 from forms.create_test import CreateTestForm
 from forms.create_contest import CreateContestForm
 from forms.contest_add_problem import ContestAddProblemForm
+from forms.create_group import CreateGroupForm
 from SolutionChecker import SolutionChecker
 from Constants import *
 
@@ -353,6 +354,8 @@ def edit_contest(contest_id):
 
 
 @app.route('/contests/<int:contest_id>/delete')
+@login_required
+@admin_required
 def delete_contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -485,6 +488,78 @@ def groups():
     groups = session.query(Group).order_by(Group.id).all()
     return render_template('groups.html', title="Группы",
                            groups=groups)
+
+
+@app.route('/groups/<int:group_id>')
+@login_required
+@admin_required
+def group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+
+    if not group:
+        abort(404)
+
+    return render_template('group.html', title=group.name, group=group)
+
+
+@app.route('/groups/create', methods=["GET", "POST"])
+@login_required
+@admin_required
+def create_group():
+    session = db_session.create_session()
+    form = CreateGroupForm()
+
+    if form.validate_on_submit():
+        group = Group()
+        group.name = form.name.data
+
+        session.add(group)
+        session.commit()
+
+        return redirect(f'/groups/{group.id}')
+
+    return render_template('create_group.html', title="Создать группу",
+                           form=form, action="Создать")
+
+
+@app.route('/groups/<int:group_id>/edit', methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    if not group:
+        abort(404)
+
+    form = CreateGroupForm()
+    if form.validate_on_submit():
+        group.name = form.name.data
+
+        session.commit()
+
+        return redirect(f'/groups/{group.id}')
+
+    form.name.data = group.name
+
+    return render_template('create_group.html', title=f'Редактирование группы "{group.name}"',
+                           form=form, action="Сохранить")
+
+
+@app.route('/groups/<int:group_id>/delete')
+@login_required
+@admin_required
+def delete_group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+
+    if not group:
+        abort(404)
+
+    session.delete(group)
+    session.commit()
+
+    return redirect('/groups')
 
 
 @app.route('/register', methods=['GET', 'POST'])
