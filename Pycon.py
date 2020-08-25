@@ -8,10 +8,12 @@ from multiprocessing import Process
 from functools import wraps
 from data import db_session
 from data.models.contest import *
+from data.models.group import *
 from data.models.problem import *
 from data.models.submission import *
 from data.models.test import *
 from data.models.user import *
+from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
 from forms.submit import SubmitFileForm, SubmitTextForm
@@ -19,6 +21,9 @@ from forms.create_problem import CreateProblemForm
 from forms.create_test import CreateTestForm
 from forms.create_contest import CreateContestForm
 from forms.contest_add_problem import ContestAddProblemForm
+from forms.create_group import CreateGroupForm
+from forms.group_add_user import GroupAddUserForm
+from forms.create_news import CreateNewsForm
 from SolutionChecker import SolutionChecker
 from Constants import *
 
@@ -30,7 +35,6 @@ app.config['DATABASE_URI'] = DATABASE_URI
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
 
 PyconSolutionChecker = SolutionChecker()
 PyconSolutionCheckerProcess = Process(target=PyconSolutionChecker.parse)
@@ -53,7 +57,10 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', title='Pycon')
+    session = db_session.create_session()
+    news = session.query(News).all()
+
+    return render_template('index.html', title='Pycon', news=news)
 
 
 @app.errorhandler(404)
@@ -160,7 +167,8 @@ def edit_problem(problem_id):
     return render_template('create_problem.html', title=f"Редактирование задачи №{problem_id}",
                            form=form, action="Сохранить")
 
-@app.route('/problems/<int:problem_id>/create_test', methods=["GET", "POST"])
+
+@app.route('/problems/<int:problem_id>/tests/create', methods=["GET", "POST"])
 @login_required
 @admin_required
 def create_test(problem_id):
@@ -251,10 +259,10 @@ def problem_tests(problem_id):
     return render_template('problem_tests.html', title=f"Тесты задачи №{problem_id}",
                            problem=problem)
 
-@app.route('/problems/<int:problem_id>/tests/<int:test_id>/delete')
+@app.route('/problems/<int:problem_id>/tests/<int:test_id>/remove')
 @login_required
 @admin_required
-def delete_problem_test(problem_id, test_id):
+def remove_problem_test(problem_id, test_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
     test = session.query(Test).get(test_id)
@@ -351,6 +359,8 @@ def edit_contest(contest_id):
 
 
 @app.route('/contests/<int:contest_id>/delete')
+@login_required
+@admin_required
 def delete_contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -443,10 +453,10 @@ def contest_standings_csv(contest_id):
                      cache_timeout=-1)
         
 
-@app.route('/contests/<int:contest_id>/delete_problem/<int:problem_id>')
+@app.route('/contests/<int:contest_id>/remove_problem/<int:problem_id>')
 @login_required
 @admin_required
-def delete_contest_problem(contest_id, problem_id):
+def contest_remove_problem(contest_id, problem_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
     problem = session.query(Problem).get(problem_id)
@@ -475,11 +485,203 @@ def join_contest(contest_id):
     return redirect(f'/contests/{contest_id}')
 
 
+@app.route('/groups')
+@login_required
+@admin_required
+def groups():
+    session = db_session.create_session()
+    groups = session.query(Group).order_by(Group.id).all()
+    return render_template('groups.html', title="Группы",
+                           groups=groups)
+
+
+@app.route('/groups/<int:group_id>')
+@login_required
+@admin_required
+def group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+
+    if not group:
+        abort(404)
+
+    return render_template('group.html', title=group.name, group=group)
+
+
+@app.route('/groups/create', methods=["GET", "POST"])
+@login_required
+@admin_required
+def create_group():
+    session = db_session.create_session()
+    form = CreateGroupForm()
+
+    if form.validate_on_submit():
+        group = Group()
+        group.name = form.name.data
+
+        session.add(group)
+        session.commit()
+
+        return redirect(f'/groups/{group.id}')
+
+    return render_template('create_group.html', title="Создать группу",
+                           form=form, action="Создать")
+
+
+@app.route('/groups/<int:group_id>/edit', methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    if not group:
+        abort(404)
+
+    form = CreateGroupForm()
+    if form.validate_on_submit():
+        group.name = form.name.data
+
+        session.commit()
+
+        return redirect(f'/groups/{group.id}')
+
+    form.name.data = group.name
+
+    return render_template('create_group.html', title=f'Редактирование группы "{group.name}"',
+                           form=form, action="Сохранить")
+
+
+@app.route('/groups/<int:group_id>/delete')
+@login_required
+@admin_required
+def delete_group(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+
+    if not group:
+        abort(404)
+
+    session.delete(group)
+    session.commit()
+
+    return redirect('/groups')
+
+
+@app.route('/groups/<int:group_id>/add_user', methods=["GET", "POST"])
+@login_required
+@admin_required
+def group_add_user(group_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    if not group:
+        abort(404)
+
+    form = GroupAddUserForm()
+    if form.validate_on_submit():
+        user_id = form.user_id.data
+        user = session.query(User).get(user_id)
+        if not user:
+            return render_template('group_add_user.html',
+                                   title=f"Добавить пользователя в группу \"{group.name}\"",
+                                   form=form,
+                                   message="Пользователя с таким ID нет.")
+
+        group.add_user(user)
+        session.commit()
+        return redirect(f'/groups/{group_id}')
+
+    return render_template('group_add_user.html',
+                           title=f"Добавить пользователя в группу \"{group.name}\"",
+                           form=form)
+
+
+@app.route('/groups/<int:group_id>/remove_user/<int:user_id>')
+@login_required
+@admin_required
+def group_remove_user(group_id, user_id):
+    session = db_session.create_session()
+    group = session.query(Group).get(group_id)
+    user = session.query(User).get(user_id)
+
+    if not group or not user:
+        abort(404)
+
+    group.remove_user(user)
+
+    session.commit()
+    return redirect(f'/groups/{group_id}')
+
+
+@app.route('/news/create', methods=["GET", "POST"])
+@login_required
+@admin_required
+def create_news():
+    session = db_session.create_session()
+    form = CreateNewsForm()
+
+    if form.validate_on_submit():
+        news = News()
+        news.author = current_user
+        news.title = form.title.data
+        news.body = form.body.data
+
+        session.add(news)
+        session.commit()
+
+        return redirect('/')
+
+    return render_template('create_news.html', title="Опубликовать новость",
+                           form=form, action="Опубликовать")
+
+
+@app.route('/news/<int:news_id>/edit', methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_news(news_id):
+    session = db_session.create_session()
+    news = session.query(News).get(news_id)
+    if not news:
+        abort(404)
+
+    form = CreateNewsForm()
+    if form.validate_on_submit():
+        news.title = form.title.data
+        news.body = form.body.data
+
+        session.commit()
+
+        return redirect(f'/')
+
+    form.title.data = news.title
+    form.body.data = news.body
+
+    return render_template('create_news.html', title=f'Редактирование новости №{news.id}',
+                           form=form, action="Сохранить")
+
+
+@app.route('/news/<int:news_id>/delete')
+@login_required
+@admin_required
+def delete_news(news_id):
+    session = db_session.create_session()
+    news = session.query(News).get(news_id)
+
+    if not news:
+        abort(404)
+
+    session.delete(news)
+    session.commit()
+
+    return redirect('/')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    session = db_session.create_session()
+    form.group.choices += [(group.id, group.name) for group in session.query(Group).all()]
+
     if form.validate_on_submit():
-        session = db_session.create_session()
         if session.query(User).filter(User.login == form.login.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -491,6 +693,7 @@ def register():
         user = User()
         user.login = form.login.data
         user.email = form.email.data
+        user.group = session.query(Group).get(form.group.data)
         user.set_password(form.password.data)
         
         session.add(user)
@@ -521,13 +724,12 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    current_user
     logout_user()
     return redirect(request.args.get('next') or '/')
 
 
 if __name__ == '__main__':
-    db_session.global_init(app.config['DATABASE_URI'])
     os.chdir(APP_ROOT)
+    db_session.global_init(app.config['DATABASE_URI'])
     PyconSolutionCheckerProcess.start()
     app.run(port=APP_PORT, host='0.0.0.0')

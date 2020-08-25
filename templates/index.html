@@ -3,18 +3,43 @@
 {% block content %}
   <h1>Pycon</h1>
   <br>
-  Добро пожаловать на <b>Pycon</b> — площадку для проведения олимпиад по спортивному программированию на Python.
+  Добро пожаловать на <b>Pycon</b> — площадку для обучения программированию на Python и C#.
   <br><br>
   Здесь есть <a href="/problems">задачи</a> и <a href="/contests">контесты</a>.
   <br><br>
   Чтобы принимать участие в контестах, вам нужно <a href="/login">войти в систему</a>, а если нет аккаунта — <a href="/register">зарегистрироваться</a>.
   <br><br>
-  Наверное, здесь достаточно просто что-нибудь сломать или взломать. Не надо, пожалуйста.
+  Сейчас платформа находится в стадии тестирования. <a>Обратная связь</a>
   <br><br>
-  Название читается как <i>«Па́йкон»</i>.
-  <br><br>
-  Сейчас платформа находится в стадии тестирования. Все замечания запомните до того момента, как мы будем собирать обратную связь.
-  <br><br>
-  Удачи!
-  <br><br>
+
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <a href="/news/create" class="alert-admin">Создать новость</a>
+  {% endif %}
+
+  {% if news %}
+    <div class="content-block">
+      {% for new in news %}
+        <div class="news-block">
+          <h3>
+            {{ new.title|safe }}<br>
+
+            <span class="normal-grey-label">
+              <a href="/users/{{ new.author.id }}">{{ new.author.login }}</a>,
+              {{ new.publication_date.strftime("%d.%m.%Y %H:%M") }}
+            </span>
+          </h3>
+          <div style="height: 20px;"></div>
+
+          {{ new.body|safe }}
+          <div style="height: 20px;"></div>
+
+          {% if current_user.is_authenticated and current_user.is_admin() %}
+            <a href="/news/{{ new.id }}/edit" class="alert-admin">Редактировать</a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="/news/{{ new.id }}/delete" class="alert-admin">Удалить</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 {% endblock %}

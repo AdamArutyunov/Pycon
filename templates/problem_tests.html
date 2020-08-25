@@ -7,7 +7,7 @@
     </h3>
   </div>
   <div class="content-block">
-    <a href="/problems/{{ problem.id }}/create_test">
+    <a href="/problems/{{ problem.id }}/tests/create">
       Создать тест
     </a>
   </div>
@@ -16,7 +16,7 @@
       {% for test in problem.tests %}
         <h4>
           #{{ test.number }}
-          <a class="alert-danger delete-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/delete">
+          <a class="alert-danger delete-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/remove">
             ×
           </a>
         </h4>

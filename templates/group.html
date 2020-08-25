@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header" id="problem-header">
+    <h1>
+      {{ group.name }}
+    </h1>
+  </div>
+
+  <div class="content-block">
+    {% if group.users %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Логин
+            </span>
+          </th>
+        </tr>
+        {% for user in group.users %}
+          <tr>
+            <td class="id-td">
+              {{ loop.index }}
+            </td>
+            <td class="problemname-td">
+              <a href="/users/{{ user.id }}">{{ user.login }}</a>
+            </td>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/groups/{{ group.id }}/remove_user/{{ user.id }}">
+                  ×
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+
+  {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div class="normal-block" id="admin-features">
+      <br>
+      <a href="/groups/{{group.id}}/add_user" class="list alert-admin">
+        Добавить пользователя
+      </a>
+      <br>
+      <a href="/groups/{{group.id}}/edit" class="list alert-admin">
+        Редактировать группу
+      </a>
+      <br>
+      <a href="/groups/{{ group.id }}/delete" class="alert-danger list">
+        Удалить группу
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}

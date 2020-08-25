@@ -3,11 +3,11 @@
 {% block content %}
   <div class="content-header">
     <h2>
-      Контесты
+      Группы
     </h2>
   </div>
   <div class="content-block">
-    {% if contests %}
+    {% if groups %}
       <table class="submissions-table">
         <tr>
           <th class="id-td">
@@ -22,40 +22,24 @@
           </th>
           <th class="solutions-td">
             <span>
-              Начало
-            </span>
-          </th>
-          <th class="solutions-td">
-            <span>
-              Длительность
-            </span>
-          </th>
-          <th class="solutions-td">
-            <span>
-              Участников
+              =
             </span>
           </th>
         </tr>
-        {% for contest in contests %}
-          <tr {{ "class=inactive-contest" if contest.is_finished() }}>
+        {% for group in groups %}
+          <tr>
             <td class="id-td">
-              {{ contest.id }}
+              {{ group.id }}
             </td>
             <td class="problemname-td">
-              <a href="/contests/{{ contest.id }}">{{ contest.name }}</a>
+              <a href="/groups/{{ group.id }}">{{ group.name }}</a>
             </td>
-            <td class="id-td">
-              {{ contest.start_date.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
-            </td>
-            <td class="id-td">
-              {{ contest.duration.__str__() }}
-            </td>
-            <td class="id-td">
-              {{ contest.participants|length }}
-            </td>
+            <th class="solutions-td">
+              {{ group.users|length }}
+            </th>
             {% if current_user.is_authenticated and current_user.is_admin() %}
               <td class="id-td">
-                <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete">
+                <a class="alert-danger delete-button" href="/groups/{{ group.id }}/delete">
                   ×
                 </a>
               </td>
@@ -67,8 +51,8 @@
   </div>
   {% if current_user.is_authenticated and current_user.is_admin() %}
     <div class="normal-block" id="admin-features">
-      <a href="/contests/create" class="list alert-admin">
-        Создать контест
+      <a href="/groups/create" class="list alert-admin">
+        Создать группу
       </a>
     </div>
   {% endif %}

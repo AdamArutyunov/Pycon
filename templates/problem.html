@@ -98,11 +98,11 @@
     {% endif %}
     {% if current_user.is_authenticated and current_user.is_admin() %}
       <div class="normal-block" id="admin-features">
-        <a href="/problems/{{problem.id}}/tests" class="list">
+        <a href="/problems/{{problem.id}}/tests" class="list alert-admin">
           Посмотреть тесты
         </a>
         <br>
-        <a href="/problems/{{problem.id}}/edit" class="list">
+        <a href="/problems/{{problem.id}}/edit" class="list alert-admin">
           Редактировать задачу
         </a>
         <br>

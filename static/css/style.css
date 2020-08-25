@@ -102,6 +102,24 @@ a.alert-danger:hover {
   border-color: #FF0000;
 }
 
+a.alert-warning {
+  border-color: #FFA500;
+}
+
+a.alert-warning:hover {
+  color: #FF0000;
+  border-color: #FF0000;
+}
+
+a.alert-admin {
+  border-color: #9D00FF;
+}
+
+a.alert-admin:hover {
+  color: #FF0000;
+  border-color: #FF0000;
+}
+
 a.list {
   margin: 5px 0;
   display: inline-block;
@@ -174,6 +192,14 @@ input[type="file"] {
   font-size: 15px;
 }
 
+select {
+  padding: 5px;
+  width: 100%;
+  border: 1px solid var(--primary-color);
+  outline: none;
+  margin: 10px 0;
+}
+
 input:active, input:focus, textarea:active, textarea:focus {
   outline: none;
 }
@@ -235,6 +261,7 @@ table a {
 .link-wrapper {
   display: inline-block;
   margin-right: 30px;
+  margin-bottom: 5px;
 }
 
 .content-block {
@@ -267,6 +294,7 @@ table a {
 
 .normal-grey-label {
   font-weight: 100;
+  font-size: 14pt;
   color: var(--light-grey);
 }
 
@@ -315,6 +343,14 @@ table a {
 
 .alert-danger {
   color: #DD0000;
+}
+
+.alert-warning {
+  color: #FFA500;
+}
+
+.alert-admin {
+  color: #9D00FF;
 }
 
 .big-fucking-span {
@@ -387,7 +423,7 @@ table a {
 .delete-button {
   border: none;
   position: absolute;
-  top: -5px;
+  top: -6px;
   font-size: 20pt;
 }
 
@@ -440,6 +476,13 @@ table a {
   color: #DDD;
 }
 
+.news-block {
+  border-left: 3px solid var(--primary-color);
+  width: 100%;
+  padding: 20px 30px;
+  margin: 20px 0;
+}
+
 #limits {
   color: var(--light-grey);
 }
@@ -447,7 +490,7 @@ table a {
 #login-block {
   display: inline-block;
   vertical-align: top;
-  margin-top: 60px;
+  margin-top: 50px;
   float: right;
   margin-right: 60px;
   text-align: right;
@@ -485,7 +528,8 @@ table a {
 #header-links {
   display: inline-block;
   margin-left: 130px;
-  margin-top: 60px;
+  margin-top: 50px;
   vertical-align: top;
   font-size: 15pt;
+  line-height: 1.5;
 }
