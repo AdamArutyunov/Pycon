@@ -20,6 +20,11 @@
               Название
             </span>
           </th>
+          <th class="solutions-td">
+            <span>
+              =
+            </span>
+          </th>
         </tr>
         {% for group in groups %}
           <tr>
@@ -29,6 +34,9 @@
             <td class="problemname-td">
               <a href="/groups/{{ group.id }}">{{ group.name }}</a>
             </td>
+            <th class="solutions-td">
+              {{ group.users|length }}
+            </th>
             {% if current_user.is_authenticated and current_user.is_admin() %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/groups/{{ group.id }}/delete">
@@ -43,7 +51,7 @@
   </div>
   {% if current_user.is_authenticated and current_user.is_admin() %}
     <div class="normal-block" id="admin-features">
-      <a href="/groups/create" class="list">
+      <a href="/groups/create" class="list alert-admin">
         Создать группу
       </a>
     </div>

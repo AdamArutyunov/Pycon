@@ -111,6 +111,15 @@ a.alert-warning:hover {
   border-color: #FF0000;
 }
 
+a.alert-admin {
+  border-color: #9D00FF;
+}
+
+a.alert-admin:hover {
+  color: #FF0000;
+  border-color: #FF0000;
+}
+
 a.list {
   margin: 5px 0;
   display: inline-block;
@@ -285,6 +294,7 @@ table a {
 
 .normal-grey-label {
   font-weight: 100;
+  font-size: 14pt;
   color: var(--light-grey);
 }
 
@@ -337,6 +347,10 @@ table a {
 
 .alert-warning {
   color: #FFA500;
+}
+
+.alert-admin {
+  color: #9D00FF;
 }
 
 .big-fucking-span {
@@ -409,7 +423,7 @@ table a {
 .delete-button {
   border: none;
   position: absolute;
-  top: -5px;
+  top: -6px;
   font-size: 20pt;
 }
 
@@ -460,6 +474,13 @@ table a {
 
 .inactive-contest {
   color: #DDD;
+}
+
+.news-block {
+  border-left: 3px solid var(--primary-color);
+  width: 100%;
+  padding: 20px 30px;
+  margin: 20px 0;
 }
 
 #limits {

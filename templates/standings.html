@@ -79,7 +79,7 @@
       </table>
       {% if current_user.is_authenticated and current_user.is_admin() %}
         <div class="content-block">
-          <a href="/contests/{{ contest.id }}/standings/csv">
+          <a href="/contests/{{ contest.id }}/standings/csv" class="alert-admin">
             Скачать CSV
           </a>
         </div>

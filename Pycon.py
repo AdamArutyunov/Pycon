@@ -13,6 +13,7 @@ from data.models.problem import *
 from data.models.submission import *
 from data.models.test import *
 from data.models.user import *
+from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
 from forms.submit import SubmitFileForm, SubmitTextForm
@@ -22,6 +23,7 @@ from forms.create_contest import CreateContestForm
 from forms.contest_add_problem import ContestAddProblemForm
 from forms.create_group import CreateGroupForm
 from forms.group_add_user import GroupAddUserForm
+from forms.create_news import CreateNewsForm
 from SolutionChecker import SolutionChecker
 from Constants import *
 
@@ -55,7 +57,10 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', title='Pycon')
+    session = db_session.create_session()
+    news = session.query(News).all()
+
+    return render_template('index.html', title='Pycon', news=news)
 
 
 @app.errorhandler(404)
@@ -163,7 +168,7 @@ def edit_problem(problem_id):
                            form=form, action="Сохранить")
 
 
-@app.route('/problems/<int:problem_id>/create_test', methods=["GET", "POST"])
+@app.route('/problems/<int:problem_id>/tests/create', methods=["GET", "POST"])
 @login_required
 @admin_required
 def create_test(problem_id):
@@ -254,10 +259,10 @@ def problem_tests(problem_id):
     return render_template('problem_tests.html', title=f"Тесты задачи №{problem_id}",
                            problem=problem)
 
-@app.route('/problems/<int:problem_id>/tests/<int:test_id>/delete')
+@app.route('/problems/<int:problem_id>/tests/<int:test_id>/remove')
 @login_required
 @admin_required
-def delete_problem_test(problem_id, test_id):
+def remove_problem_test(problem_id, test_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
     test = session.query(Test).get(test_id)
@@ -605,6 +610,69 @@ def group_remove_user(group_id, user_id):
 
     session.commit()
     return redirect(f'/groups/{group_id}')
+
+
+@app.route('/news/create', methods=["GET", "POST"])
+@login_required
+@admin_required
+def create_news():
+    session = db_session.create_session()
+    form = CreateNewsForm()
+
+    if form.validate_on_submit():
+        news = News()
+        news.author = current_user
+        news.title = form.title.data
+        news.body = form.body.data
+
+        session.add(news)
+        session.commit()
+
+        return redirect('/')
+
+    return render_template('create_news.html', title="Опубликовать новость",
+                           form=form, action="Опубликовать")
+
+
+@app.route('/news/<int:news_id>/edit', methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_news(news_id):
+    session = db_session.create_session()
+    news = session.query(News).get(news_id)
+    if not news:
+        abort(404)
+
+    form = CreateNewsForm()
+    if form.validate_on_submit():
+        news.title = form.title.data
+        news.body = form.body.data
+
+        session.commit()
+
+        return redirect(f'/')
+
+    form.title.data = news.title
+    form.body.data = news.body
+
+    return render_template('create_news.html', title=f'Редактирование новости №{news.id}',
+                           form=form, action="Сохранить")
+
+
+@app.route('/news/<int:news_id>/delete')
+@login_required
+@admin_required
+def delete_news(news_id):
+    session = db_session.create_session()
+    news = session.query(News).get(news_id)
+
+    if not news:
+        abort(404)
+
+    session.delete(news)
+    session.commit()
+
+    return redirect('/')
 
 
 @app.route('/register', methods=['GET', 'POST'])
