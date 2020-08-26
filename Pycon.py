@@ -209,14 +209,29 @@ def delete_problem(problem_id):
     return redirect('/problems')
 
 
-@app.route('/raw_submissions')
+@app.route('/submissions')
 @login_required
-def raw_submissions():
+def submissions():
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
     return render_template('submissions/submissions.html', title="Посылки",
                            submissions=submissions)
+
+
+@app.route('/submissions/<int:submission_id>')
+def submission(submission_id):
+    session = db_session.create_session()
+
+    submission = session.query(Submission).get(submission_id)
+    if not submission:
+        abort(404)
+
+    if submission.submitter != current_user and not current_user.is_admin():
+        abort(403)
+
+    return render_template('submissions/submission.html', title=f"Посылка №{submission.id}",
+                           submission=submission)
 
 
 @app.route('/all_submissions')
@@ -228,12 +243,6 @@ def all_submissions():
                   .order_by(Submission.id.desc()).all()
     return render_template('submissions/submissions.html', title="Все посылки",
                            submissions=submissions)
-
-
-@app.route('/submissions')
-@login_required
-def submissions():
-    return render_template('submissions/submissions_ajax.html')
 
 
 @app.route('/problems/<int:problem_id>/submissions')

@@ -8,6 +8,7 @@
   <h1 {% if user.is_admin() %}class="alert-admin"{% endif %} style="font-size: 80pt">{{ user.login }}</h1>
 
   <div class="small-block" style="line-height: 2">
+    <h4>#{{ user.id }}</h4>
     Группа:
     {% if user.group %}
       <a href="/groups/{{ user.group.id }}">{{ user.group.name }}</a>
