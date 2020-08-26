@@ -32,10 +32,6 @@ class SolutionChecker:
         session.add(submission)
         session.commit()
 
-    def limit_process_memory(self, bytes_limit):
-        resource.setrlimit(resource.RLIMIT_AS, (bytes_limit, bytes_limit))
-        soft, hard = resource.getrlimit(resource.RLIMIT_AS)
-
     def parse(self):
         session = db_session.create_session()
         while True:
@@ -63,7 +59,7 @@ class SolutionChecker:
         tests = problem.tests
         time_limit = problem.time_limit
         memory_limit = problem.memory_limit
-        for test in problem.tests:
+        for test in tests:
             submission.set_current_test(test)
             session.commit()
             
