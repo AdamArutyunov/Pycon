@@ -172,7 +172,7 @@ input[type="submit"]  {
   font-size: 15pt;
   font-weight: normal;
   text-align: center;
-  height: 45px;
+  height: 42px;
   background-color: var(--primary-color);
   border: 1px solid var(--primary-color);
   border-radius: 5px;

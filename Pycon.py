@@ -16,7 +16,7 @@ from data.models.user import *
 from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
-from forms.submit import SubmitFileForm, SubmitTextForm
+from forms.submit import SubmitForm
 from forms.create_problem import CreateProblemForm
 from forms.create_test import CreateTestForm
 from forms.create_contest import CreateContestForm
@@ -90,23 +90,25 @@ def problem(problem_id):
     if not problem:
         abort(404)
 
-    submit_file = SubmitFileForm()
-    submit_text = SubmitTextForm()
-    if submit_file.validate_on_submit():
-        PyconSolutionChecker.submit(problem, submit_file.language.data,
-                                    submit_file.data.data.read().decode(encoding='utf-8'))
-        return redirect(f'/submissions')
-    
-    if submit_text.validate_on_submit():
-        PyconSolutionChecker.submit(problem, submit_text.language.data,
-                                    submit_text.data.data)
+    submit_form = SubmitForm()
+    if submit_form.validate_on_submit():
+        file = submit_form.data_file.data
+        if file:
+            PyconSolutionChecker.submit(problem, submit_form.language.data,
+                                        file.read().decode(encoding='utf-8'))
+
+            return redirect(f'/submissions')
+
+        data = submit_form.data.data
+        PyconSolutionChecker.submit(problem, submit_form.language.data,
+                                    data)
+
         return redirect(f'/submissions')
     
     return render_template('problems/problem.html',
                            title=f"Задача №{problem_id}",
                            problem=problem,
-                           submit_file_form=submit_file,
-                           submit_text_form=submit_text)
+                           submit_form=submit_form)
 
 
 @app.route('/problems/create', methods=["GET", "POST"])

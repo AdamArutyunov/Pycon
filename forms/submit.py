@@ -6,14 +6,9 @@ from wtforms.widgets import TextArea
 from lib.Languages import *
 
 
-class SubmitFileForm(FlaskForm):
-    language = SelectField("Язык", coerce=int, choices=list(map(lambda x: (x.id, x.display_name),
-                                                                language_association[1:])))
-    data = FileField(validators=[FileRequired()])
-
-
-class SubmitTextForm(FlaskForm):
+class SubmitForm(FlaskForm):
     language = SelectField("Язык", coerce=int, choices=list(map(lambda x: (x.id, x.display_name),
                                                                 language_association[1:])))
     data = StringField(widget=TextArea())
-    submit = SubmitField('Отправить')
+    data_file = FileField()
+    submit_button = SubmitField('Отправить')
