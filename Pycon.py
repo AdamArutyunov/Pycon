@@ -16,7 +16,7 @@ from data.models.user import *
 from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
-from forms.submit import SubmitFileForm, SubmitTextForm
+from forms.submit import SubmitForm
 from forms.create_problem import CreateProblemForm
 from forms.create_test import CreateTestForm
 from forms.create_contest import CreateContestForm
@@ -79,7 +79,7 @@ def forbidden(error):
 def problems():
     session = db_session.create_session()
     problems = session.query(Problem).order_by(Problem.id.desc()).all()
-    return render_template('problems.html', title="Задачи",
+    return render_template('problems/problems.html', title="Задачи",
                            problems=problems)
 
 
@@ -90,23 +90,25 @@ def problem(problem_id):
     if not problem:
         abort(404)
 
-    submit_file = SubmitFileForm()
-    submit_text = SubmitTextForm()
-    if submit_file.validate_on_submit():
-        PyconSolutionChecker.submit(problem,
-                                    submit_file.data.data.read().decode(encoding='utf-8'))
+    submit_form = SubmitForm()
+    if submit_form.validate_on_submit():
+        file = submit_form.data_file.data
+        if file:
+            PyconSolutionChecker.submit(problem, submit_form.language.data,
+                                        file.read().decode(encoding='utf-8'))
+
+            return redirect(f'/submissions')
+
+        data = submit_form.data.data
+        PyconSolutionChecker.submit(problem, submit_form.language.data,
+                                    data)
+
         return redirect(f'/submissions')
     
-    if submit_text.validate_on_submit():
-        PyconSolutionChecker.submit(problem,
-                                    submit_text.data.data)
-        return redirect(f'/submissions')
-    
-    return render_template('problem.html',
+    return render_template('problems/problem.html',
                            title=f"Задача №{problem_id}",
                            problem=problem,
-                           submit_file_form=submit_file,
-                           submit_text_form=submit_text)
+                           submit_form=submit_form)
 
 
 @app.route('/problems/create', methods=["GET", "POST"])
@@ -129,7 +131,7 @@ def create_problem():
 
         return redirect(f'/problems/{problem.id}')
     
-    return render_template('create_problem.html',
+    return render_template('problems/create_problem.html',
                            title=f"Создать задачу",
                            form=form, action="Создать")
 
@@ -164,7 +166,7 @@ def edit_problem(problem_id):
     form.time_limit.data = problem.time_limit
     form.memory_limit.data = problem.memory_limit
 
-    return render_template('create_problem.html', title=f"Редактирование задачи №{problem_id}",
+    return render_template('problems/create_problem.html', title=f"Редактирование задачи №{problem_id}",
                            form=form, action="Сохранить")
 
 
@@ -190,7 +192,7 @@ def create_test(problem_id):
         session.commit()
         
         return redirect(f'/problems/{problem_id}/tests')
-    return render_template('create_test.html', title="Создать тест",
+    return render_template('problems/create_test.html', title="Создать тест",
                            form=form)
 
 
@@ -209,14 +211,29 @@ def delete_problem(problem_id):
     return redirect('/problems')
 
 
-@app.route('/raw_submissions')
+@app.route('/submissions')
 @login_required
-def raw_submissions():
+def submissions():
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
-    return render_template('submissions.html', title="Посылки",
+    return render_template('submissions/submissions.html', title="Посылки",
                            submissions=submissions)
+
+
+@app.route('/submissions/<int:submission_id>')
+def submission(submission_id):
+    session = db_session.create_session()
+
+    submission = session.query(Submission).get(submission_id)
+    if not submission:
+        abort(404)
+
+    if submission.submitter != current_user and not current_user.is_admin():
+        abort(403)
+
+    return render_template('submissions/submission.html', title=f"Посылка №{submission.id}",
+                           submission=submission)
 
 
 @app.route('/all_submissions')
@@ -226,14 +243,8 @@ def all_submissions():
     session = db_session.create_session()
     submissions = session.query(Submission)\
                   .order_by(Submission.id.desc()).all()
-    return render_template('submissions.html', title="Все посылки",
+    return render_template('submissions/submissions.html', title="Все посылки",
                            submissions=submissions)
-
-
-@app.route('/submissions')
-@login_required
-def submissions():
-    return render_template('submissions_ajax.html')
 
 
 @app.route('/problems/<int:problem_id>/submissions')
@@ -243,7 +254,7 @@ def problem_submissions(problem_id):
     submissions = session.query(Submission).join(Problem).filter((Submission.submitter == current_user) &
                                                                  (Problem.id == problem_id))\
                   .order_by(Submission.id.desc()).all()
-    return render_template('submissions.html', title=f"Посылки задачи №{problem_id}",
+    return render_template('submissions/submissions.html', title=f"Посылки задачи №{problem_id}",
                            submissions=submissions)
 
 
@@ -256,8 +267,9 @@ def problem_tests(problem_id):
     if not problem:
         abort(404)
 
-    return render_template('problem_tests.html', title=f"Тесты задачи №{problem_id}",
+    return render_template('problems/problem_tests.html', title=f"Тесты задачи №{problem_id}",
                            problem=problem)
+
 
 @app.route('/problems/<int:problem_id>/tests/<int:test_id>/remove')
 @login_required
@@ -297,7 +309,7 @@ def create_contest():
 
         return redirect(f'/contests/{contest.id}')
 
-    return render_template('create_contest.html', title="Создать контест",
+    return render_template('contests/create_contest.html', title="Создать контест",
                            form=form, action="Создать")
 
 
@@ -315,7 +327,7 @@ def contest_add_problem(contest_id):
         problem_id = form.problem_id.data
         problem = session.query(Problem).get(problem_id)
         if not problem:
-            return render_template('contest_add_problem.html',
+            return render_template('contests/contest_add_problem.html',
                                    title=f"Добавить задачу в контест №{contest_id}",
                                    form=form,
                                    message="Задачи с таким ID нет.")
@@ -324,7 +336,7 @@ def contest_add_problem(contest_id):
         session.commit()
         return redirect(f'/contests/{contest_id}')
 
-    return render_template('contest_add_problem.html',
+    return render_template('contests/contest_add_problem.html',
                            title=f"Добавить задачу в контест №{contest_id}",
                            form=form)
 
@@ -354,7 +366,7 @@ def edit_contest(contest_id):
     form.duration.data = int(contest.duration.total_seconds() // 60)
     form.hidden.data = contest.hidden
 
-    return render_template('create_contest.html', title=f"Редактирование контеста №{contest_id}",
+    return render_template('contests/create_contest.html', title=f"Редактирование контеста №{contest_id}",
                            form=form, action="Сохранить")
 
 
@@ -379,7 +391,7 @@ def contests():
     session = db_session.create_session()
     contests = session.query(Contest).order_by(Contest.id.desc()).all()
 
-    return render_template('contests.html', title="Контесты",
+    return render_template('contests/contests.html', title="Контесты",
                            contests=contests)
 
 
@@ -390,8 +402,9 @@ def contest(contest_id):
     if not contest:
         abort(404)
 
-    return render_template('contest.html', title=f'Контест №{contest_id}',
+    return render_template('contests/contest.html', title=f'Контест №{contest_id}',
                            contest=contest)
+
 
 @app.route('/contests/<int:contest_id>/standings')
 def contest_standings(contest_id):
@@ -405,7 +418,7 @@ def contest_standings(contest_id):
     standings = sorted(contest.participants,
                        key=lambda x: -x.user.get_solved_contest_problems_count(contest))
 
-    return render_template('standings.html', title=f"Результаты контеста №{contest_id}",
+    return render_template('contests/standings.html', title=f"Результаты контеста №{contest_id}",
                            contest=contest, standings=standings)
 
 
@@ -491,7 +504,7 @@ def join_contest(contest_id):
 def groups():
     session = db_session.create_session()
     groups = session.query(Group).order_by(Group.id).all()
-    return render_template('groups.html', title="Группы",
+    return render_template('groups/groups.html', title="Группы",
                            groups=groups)
 
 
@@ -505,7 +518,7 @@ def group(group_id):
     if not group:
         abort(404)
 
-    return render_template('group.html', title=group.name, group=group)
+    return render_template('groups/group.html', title=group.name, group=group)
 
 
 @app.route('/groups/create', methods=["GET", "POST"])
@@ -524,7 +537,7 @@ def create_group():
 
         return redirect(f'/groups/{group.id}')
 
-    return render_template('create_group.html', title="Создать группу",
+    return render_template('groups/create_group.html', title="Создать группу",
                            form=form, action="Создать")
 
 
@@ -547,7 +560,7 @@ def edit_group(group_id):
 
     form.name.data = group.name
 
-    return render_template('create_group.html', title=f'Редактирование группы "{group.name}"',
+    return render_template('groups/create_group.html', title=f'Редактирование группы "{group.name}"',
                            form=form, action="Сохранить")
 
 
@@ -581,7 +594,7 @@ def group_add_user(group_id):
         user_id = form.user_id.data
         user = session.query(User).get(user_id)
         if not user:
-            return render_template('group_add_user.html',
+            return render_template('groups/group_add_user.html',
                                    title=f"Добавить пользователя в группу \"{group.name}\"",
                                    form=form,
                                    message="Пользователя с таким ID нет.")
@@ -590,7 +603,7 @@ def group_add_user(group_id):
         session.commit()
         return redirect(f'/groups/{group_id}')
 
-    return render_template('group_add_user.html',
+    return render_template('groups/group_add_user.html',
                            title=f"Добавить пользователя в группу \"{group.name}\"",
                            form=form)
 
@@ -630,7 +643,7 @@ def create_news():
 
         return redirect('/')
 
-    return render_template('create_news.html', title="Опубликовать новость",
+    return render_template('news/create_news.html', title="Опубликовать новость",
                            form=form, action="Опубликовать")
 
 
@@ -655,7 +668,7 @@ def edit_news(news_id):
     form.title.data = news.title
     form.body.data = news.body
 
-    return render_template('create_news.html', title=f'Редактирование новости №{news.id}',
+    return render_template('news/create_news.html', title=f'Редактирование новости №{news.id}',
                            form=form, action="Сохранить")
 
 
@@ -675,6 +688,18 @@ def delete_news(news_id):
     return redirect('/')
 
 
+@app.route('/users/<int:user_id>')
+def user(user_id):
+    session = db_session.create_session()
+
+    user = session.query(User).get(user_id)
+    if not user:
+        abort(404)
+
+    return render_template('users/user.html', title=f"Профиль {user.login}",
+                           user=user)
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -683,11 +708,11 @@ def register():
 
     if form.validate_on_submit():
         if session.query(User).filter(User.login == form.login.data).first():
-            return render_template('register.html', title='Регистрация',
+            return render_template('users/register.html', title='Регистрация',
                                    form=form,
                                    message="Этот логин занят.")
         if session.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
+            return render_template('users/register.html', title='Регистрация',
                                    form=form,
                                    message="Эта почта занята.")
         user = User()
@@ -702,7 +727,7 @@ def register():
         login_user(user)
         
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('users/register.html', title='Регистрация', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -715,10 +740,10 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect(request.args.get('next') or '/')
-        return render_template('login.html',
+        return render_template('users/login.html',
                                message="Неправильный логин или пароль.",
                                form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+    return render_template('users/login.html', title='Авторизация', form=form)
 
 
 @app.route('/logout')

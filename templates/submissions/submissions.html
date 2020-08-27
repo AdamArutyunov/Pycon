@@ -50,7 +50,7 @@
         {% for submission in submissions %}
           <tr>
             <td class="id-td">
-              {{ submission.id }}
+              <a href="/submissions/{{ submission.id }}">{{ submission.id }}</a>
             </td>
             <td class="timestamp-td">
               {{ submission.submit_timestamp.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}

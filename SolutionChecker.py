@@ -10,6 +10,7 @@ from sqlalchemy.orm import scoped_session
 from flask_login import current_user
 from Constants import *
 from lib.Verdicts import *
+from lib.Languages import *
 
 
 class SolutionChecker:
@@ -19,7 +20,7 @@ class SolutionChecker:
         db_session.create_session()
         os.chdir(APP_ROOT)
 
-    def submit(self, problem, data):
+    def submit(self, problem, language, data):
         session = db_session.create_session()
         user = session.merge(current_user)
         problem = session.merge(problem)
@@ -27,14 +28,11 @@ class SolutionChecker:
         submission = Submission()
         submission.submitter = user
         submission.problem = problem
+        submission.language = language
         submission.data = data
 
         session.add(submission)
         session.commit()
-
-    def limit_process_memory(self, bytes_limit):
-        resource.setrlimit(resource.RLIMIT_AS, (bytes_limit, bytes_limit))
-        soft, hard = resource.getrlimit(resource.RLIMIT_AS)
 
     def parse(self):
         session = db_session.create_session()
@@ -60,14 +58,22 @@ class SolutionChecker:
         submitter = submission.submitter
         problem = submission.problem
         solution = submission.data
+        submission_language = submission.language
         tests = problem.tests
         time_limit = problem.time_limit
         memory_limit = problem.memory_limit
-        for test in problem.tests:
+
+        language = language_association[submission_language]
+        if language.id == 1:
+            TestChecker = PythonTestChecker
+        elif language.id == 2:
+            TestChecker = CSharpTestChecker
+
+        for test in tests:
             submission.set_current_test(test)
             session.commit()
-            
-            verdict = self.check_test(test, solution, time_limit, memory_limit)
+
+            verdict = TestChecker.check_test(test, solution, time_limit, memory_limit)
             if verdict.is_fatal:
                 submitter.unsolve_problem(problem)
                 return verdict
@@ -75,7 +81,10 @@ class SolutionChecker:
         submitter.solve_problem(problem)
         return OKVerdict()
 
-    def check_test(self, test, solution, time_limit, memory_limit):
+
+class PythonTestChecker:
+    @staticmethod
+    def check_test(test, solution, time_limit, memory_limit):
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
 
@@ -109,3 +118,45 @@ class SolutionChecker:
             return OKVerdict(time=process_time)
         return WrongAnswerVerdict(time=process_time)
         
+
+class CSharpTestChecker:
+    @staticmethod
+    def check_test(test, solution, time_limit, memory_limit):
+        with open('temp/input.txt', 'w+') as f:
+            f.write(test.input_data)
+
+        with open('temp/solution.cs', 'w+') as f:
+            f.write(solution)
+
+        try:
+            run = subprocess.run([CSHARP_COMPILE_COMMAND, "temp/solution.cs"],
+                                 timeout=time_limit)
+            run.check_returncode()
+        except subprocess.CalledProcessError as e:
+            return CompilationErrorVerdict()
+        except subprocess.TimeoutExpired:
+            return CompilationErrorVerdict()
+
+        start_time = time()
+        try:
+            run = subprocess.run([CSHARP_RUN_COMMAND, "temp/solution.exe"], stdin=open('temp/input.txt', 'r'),
+                                 stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
+                                 timeout=time_limit)
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            run.check_returncode()
+        except subprocess.CalledProcessError as e:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            return RuntimeErrorVerdict(time=process_time)
+        except subprocess.TimeoutExpired:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            return TimeLimitVerdict(time=process_time)
+
+        with open('temp/output.txt') as f:
+            output = f.read().strip()
+
+        if output == test.output_data:
+            return OKVerdict(time=process_time)
+        return WrongAnswerVerdict(time=process_time)

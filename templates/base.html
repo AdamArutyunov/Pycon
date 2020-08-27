@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
     <script src="/static/js/codemirror.js"></script>
     <script src="/static/js/python.js"></script>
+    <script src="/static/js/clike.js"></script>
     <title>{{title}}</title>
     </head>
 <body>
@@ -25,7 +26,7 @@
           '/': "Главная",
           '/problems': "Задачи",
           '/contests': "Контесты",
-          '/raw_submissions': "Мои посылки"
+          '/submissions': "Мои посылки"
         },
 
         'admin_links':
@@ -68,7 +69,7 @@
     </div>
     <div id="login-block">
       {% if current_user.is_authenticated %}
-        Вы вошли как <b>{{ current_user.login }}</b><br>
+        Вы вошли как <a href="/users/{{ current_user.id }}"><b>{{ current_user.login }}</b></a><br>
         <script>
           document.write(`<a href="/logout?next=${path}">Выйти</a><br>`)
         </script>
@@ -85,7 +86,7 @@
   </main>
   <footer>
     <div id="credits">
-      Pycon by Adam Arutyunov.<br>
+      Pycon 0.9.5 by Adam Arutyunov.<br>
       Final Yandex.Lyceum 2020 project.<br>
     </div>
     <div id="footer-div"></div>

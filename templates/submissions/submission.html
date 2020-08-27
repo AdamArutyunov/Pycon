@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% set verdict_labels = {"RE": "Ошибка исполнения",
+                         "CE": "Ошибка компиляции",
+                         "WA": "Неправильный ответ",
+                         "TL": "Превышение лимита времени",
+                         "ML": "Превышение лимита памяти"} %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Посылка №{{ submission.id }}
+    </h2>
+  </div>
+  <div class="content-block">
+    Задача: <a href="/problems/{{ submission.problem.id }}">{{ submission.problem.name }}</a>
+    <br><br>
+    Отправитель: <a href="/users/{{ submission.submitter.id }}">{{ submission.submitter.login }}</a>
+
+    <div class="normal-block">
+      <textarea id="solution-text"></textarea>
+    </div>
+
+    Вердикт:
+    <b>
+      {% if submission.verdict == None %}
+        <span class="verdict-neutral">
+          отправлено на проверку
+        </span>
+      {% elif submission.verdict == 'TG' %}
+        <span class="verdict-neutral">
+          {% if submission.test %}
+            тестируется #{{ submission.test }}
+          {% else %}
+            тестируется
+          {% endif %}
+        </span>
+      {% elif submission.verdict == 'OK' %}
+        <span class="verdict-good">
+          {{ submission.verdict }}
+        </span>
+      {% else %}
+        <span class="verdict-bad">
+          {{ submission.verdict }} #{{ submission.test }} ({{ verdict_labels[submission.verdict] }})
+        </span>
+      {% endif %}
+    </b>
+    <br><br>
+    Время: <b>{{ submission.time if submission.time else 0 }} ms</b>
+    <br><br>
+    Память: <b>INOP</b>
+  </div>
+
+  <script type="text/javascript">
+    {% if submission.language == 1 %}
+      let mode = "python"
+    {% elif submission.language == 2 %}
+      let mode = "text/x-csharp"
+    {% else %}
+      let mode = ""
+    {% endif %}
+
+    var CM = CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: mode, lineNumbers: true, indentUnit: 4, readOnly: true});
+    CM.setValue("{{ submission.data|replace("\\", "\\\\")|replace("\r", "\\\r")|replace("\n", "\\n")|replace('"', '\\"')|safe }}")
+  </script>
+{% endblock %}

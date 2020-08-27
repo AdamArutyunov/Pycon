@@ -60,33 +60,32 @@
       Сдать
     </h3>
     {% if current_user.is_authenticated %}
-      <div class="normal-block">
-        <form method="post" enctype="multipart/form-data" name="file-solution-send" action="">
-          {{ submit_file_form.hidden_tag() }}
-          <label class="label">
-            <span class="primary-button">Загрузить файл</span>
-            {{ submit_file_form.data(class="nodisp", onchange="this.form.submit()") }}
-          </label>
-          {% for error in submit_file_form.data.errors %}
+      <div class="big-block">
+        <form method="post" name="text-solution-send" enctype="multipart/form-data" action="">
+          {{ submit_form.hidden_tag() }}
+
+          {{ submit_form.data(id="solution-text") }}
+          {% for error in submit_form.data.errors %}
               <div class="alert alert-danger small-block" role="alert">
                   {{ error }}
               </div>
           {% endfor %}
-        </form>
-      </div>
-      <div class="big-block">
-        <form method="post" name="text-solution-send" action="">
-          {{ submit_text_form.hidden_tag() }}
-          {{ submit_text_form.data(id="solution-text") }}
 
-          {% for error in submit_text_form.data.errors %}
-              <div class="alert alert-danger small-block" role="alert">
+          {{ submit_form.language(onchange="change_codemirror_language()") }}<br>
+          {% for error in submit_form.language.errors %}
+              <p class="alert alert-danger" role="alert">
                   {{ error }}
-              </div>
+              </p>
           {% endfor %}
 
           <div class="small-block">
-            {{ submit_text_form.submit(class="submit_button") }}
+            {{ submit_form.submit_button(class="primary-button") }}
+
+            <label class="label">
+              <span class="primary-button">Загрузить файл</span>
+              {{ submit_form.data_file(class="nodisp", onchange="this.form.submit()") }}
+            </label>
+
           </div>
         </form>
       </div>
@@ -115,5 +114,13 @@
 
   <script type="text/javascript">
     var CM = CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: 'python', lineNumbers: true, indentUnit: 4});
+
+    function change_codemirror_language() {
+      let language = document.getElementById("language").value;
+
+      if (language == 1) CM.setOption("mode", "python");
+      else if (language == 2) CM.setOption("mode", "text/x-csharp");
+    }
+
   </script>
 {% endblock %}
