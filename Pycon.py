@@ -93,12 +93,12 @@ def problem(problem_id):
     submit_file = SubmitFileForm()
     submit_text = SubmitTextForm()
     if submit_file.validate_on_submit():
-        PyconSolutionChecker.submit(problem,
+        PyconSolutionChecker.submit(problem, submit_file.language.data,
                                     submit_file.data.data.read().decode(encoding='utf-8'))
         return redirect(f'/submissions')
     
     if submit_text.validate_on_submit():
-        PyconSolutionChecker.submit(problem,
+        PyconSolutionChecker.submit(problem, submit_text.language.data,
                                     submit_text.data.data)
         return redirect(f'/submissions')
     

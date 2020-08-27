@@ -63,6 +63,14 @@
       <div class="normal-block">
         <form method="post" enctype="multipart/form-data" name="file-solution-send" action="">
           {{ submit_file_form.hidden_tag() }}
+
+          {{ submit_file_form.language() }}<br>
+          {% for error in submit_file_form.language.errors %}
+              <p class="alert alert-danger" role="alert">
+                  {{ error }}
+              </p>
+          {% endfor %}
+
           <label class="label">
             <span class="primary-button">Загрузить файл</span>
             {{ submit_file_form.data(class="nodisp", onchange="this.form.submit()") }}
@@ -78,6 +86,13 @@
         <form method="post" name="text-solution-send" action="">
           {{ submit_text_form.hidden_tag() }}
           {{ submit_text_form.data(id="solution-text") }}
+
+          {{ submit_text_form.language() }}<br>
+          {% for error in submit_text_form.language.errors %}
+              <p class="alert alert-danger" role="alert">
+                  {{ error }}
+              </p>
+          {% endfor %}
 
           {% for error in submit_text_form.data.errors %}
               <div class="alert alert-danger small-block" role="alert">

@@ -10,6 +10,7 @@ from sqlalchemy.orm import scoped_session
 from flask_login import current_user
 from Constants import *
 from lib.Verdicts import *
+from lib.Languages import *
 
 
 class SolutionChecker:
@@ -19,7 +20,7 @@ class SolutionChecker:
         db_session.create_session()
         os.chdir(APP_ROOT)
 
-    def submit(self, problem, data):
+    def submit(self, problem, language, data):
         session = db_session.create_session()
         user = session.merge(current_user)
         problem = session.merge(problem)
@@ -27,6 +28,7 @@ class SolutionChecker:
         submission = Submission()
         submission.submitter = user
         submission.problem = problem
+        submission.language = language
         submission.data = data
 
         session.add(submission)
@@ -56,14 +58,22 @@ class SolutionChecker:
         submitter = submission.submitter
         problem = submission.problem
         solution = submission.data
+        submission_language = submission.language
         tests = problem.tests
         time_limit = problem.time_limit
         memory_limit = problem.memory_limit
+
+        language = language_association[submission_language]
+        if language.id == 1:
+            TestChecker = PythonTestChecker
+        elif language.id == 2:
+            TestChecker = CSharpTestChecker
+
         for test in tests:
             submission.set_current_test(test)
             session.commit()
-            
-            verdict = self.check_test(test, solution, time_limit, memory_limit)
+
+            verdict = TestChecker.check_test(test, solution, time_limit, memory_limit)
             if verdict.is_fatal:
                 submitter.unsolve_problem(problem)
                 return verdict
@@ -71,7 +81,10 @@ class SolutionChecker:
         submitter.solve_problem(problem)
         return OKVerdict()
 
-    def check_test(self, test, solution, time_limit, memory_limit):
+
+class PythonTestChecker:
+    @staticmethod
+    def check_test(test, solution, time_limit, memory_limit):
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
 
@@ -105,3 +118,8 @@ class SolutionChecker:
             return OKVerdict(time=process_time)
         return WrongAnswerVerdict(time=process_time)
         
+
+class CSharpTestChecker:
+    @staticmethod
+    def check_test(test, solution, time_limit, memory_limit):
+        return OKVerdict()

@@ -15,6 +15,7 @@ class Submission(SqlAlchemyBase, SerializerMixin):
     problem_id = Column(Integer, ForeignKey('problems.id'))
     problem = orm.relation("Problem")
     data = Column(String, nullable=False)
+    language = Column(Integer, nullable=False)
     submit_timestamp = Column(DateTime, default=datetime.datetime.now, nullable=False)
     verdict = Column(String, nullable=True)
     test = Column(Integer, ForeignKey("tests.number"), nullable=True)
