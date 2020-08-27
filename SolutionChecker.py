@@ -122,4 +122,41 @@ class PythonTestChecker:
 class CSharpTestChecker:
     @staticmethod
     def check_test(test, solution, time_limit, memory_limit):
-        return OKVerdict()
+        with open('temp/input.txt', 'w+') as f:
+            f.write(test.input_data)
+
+        with open('temp/solution.cs', 'w+') as f:
+            f.write(solution)
+
+        try:
+            run = subprocess.run([CSHARP_COMPILE_COMMAND, "temp/solution.cs"],
+                                 timeout=time_limit)
+            run.check_returncode()
+        except subprocess.CalledProcessError as e:
+            return CompilationErrorVerdict()
+        except subprocess.TimeoutExpired:
+            return CompilationErrorVerdict()
+
+        start_time = time()
+        try:
+            run = subprocess.run([CSHARP_RUN_COMMAND, "temp/solution.exe"], stdin=open('temp/input.txt', 'r'),
+                                 stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
+                                 timeout=time_limit)
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            run.check_returncode()
+        except subprocess.CalledProcessError as e:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            return RuntimeErrorVerdict(time=process_time)
+        except subprocess.TimeoutExpired:
+            end_time = time()
+            process_time = int((end_time - start_time) * 1000)
+            return TimeLimitVerdict(time=process_time)
+
+        with open('temp/output.txt') as f:
+            output = f.read().strip()
+
+        if output == test.output_data:
+            return OKVerdict(time=process_time)
+        return WrongAnswerVerdict(time=process_time)

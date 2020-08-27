@@ -52,7 +52,15 @@
   </div>
 
   <script type="text/javascript">
-    var CM = CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: 'python', lineNumbers: true, indentUnit: 4, readOnly: true});
+    {% if submission.language == 1 %}
+      let mode = "python"
+    {% elif submission.language == 2 %}
+      let mode = "text/x-csharp"
+    {% else %}
+      let mode = ""
+    {% endif %}
+
+    var CM = CodeMirror.fromTextArea(document.getElementById('solution-text'), {mode: mode, lineNumbers: true, indentUnit: 4, readOnly: true});
     CM.setValue("{{ submission.data|replace("\\", "\\\\")|replace("\r", "\\\r")|replace("\n", "\\n")|replace('"', '\\"')|safe }}")
   </script>
 {% endblock %}
