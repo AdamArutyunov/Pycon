@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Пользователи
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if users %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Логин
+            </span>
+          </th>
+        </tr>
+        {% for user in users %}
+          <tr>
+            <td class="id-td">
+              {{ user.id }}
+            </td>
+            <td class="problemname-td">
+              <a href="/users/{{ user.id }}">{{ user.login }}</a>
+            </td>
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/users/{{ user.id }}/delete">
+                  ×
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}

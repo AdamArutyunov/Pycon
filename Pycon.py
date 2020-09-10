@@ -688,6 +688,18 @@ def delete_news(news_id):
     return redirect('/')
 
 
+@app.route('/users')
+@login_required
+@admin_required
+def users():
+    session = db_session.create_session()
+
+    users = session.query(User).all()
+
+    return render_template('users/users.html', title="Пользователи",
+                           users=users)
+
+
 @app.route('/users/<int:user_id>')
 def user(user_id):
     session = db_session.create_session()
@@ -698,6 +710,22 @@ def user(user_id):
 
     return render_template('users/user.html', title=f"Профиль {user.login}",
                            user=user)
+
+
+@app.route('/users/<int:user_id>/delete')
+@login_required
+@admin_required
+def delete_user(user_id):
+    session = db_session.create_session()
+    user = session.query(User).get(user_id)
+
+    if not user:
+        abort(404)
+
+    session.delete(user)
+    session.commit()
+
+    return redirect('/users')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -738,7 +766,7 @@ def login():
         user = session.query(User).filter((User.email == form.login_or_email.data) |
                                           (User.login == form.login_or_email.data)).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
+            login_user(user, remember=form.remember_me.data, duration=datetime.timedelta(days=7))
             return redirect(request.args.get('next') or '/')
         return render_template('users/login.html',
                                message="Неправильный логин или пароль.",
