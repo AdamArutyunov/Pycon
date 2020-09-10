@@ -766,7 +766,7 @@ def login():
         user = session.query(User).filter((User.email == form.login_or_email.data) |
                                           (User.login == form.login_or_email.data)).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
+            login_user(user, remember=form.remember_me.data, duration=datetime.timedelta(days=7))
             return redirect(request.args.get('next') or '/')
         return render_template('users/login.html',
                                message="Неправильный логин или пароль.",
