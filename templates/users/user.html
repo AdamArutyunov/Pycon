@@ -11,7 +11,11 @@
     <h4>#{{ user.id }}</h4>
     Группа:
     {% if user.group %}
-      <a href="/groups/{{ user.group.id }}">{{ user.group.name }}</a>
+      {% if current_user.is_authenticated and current_user.is_admin() %}
+        <a href="/groups/{{ user.group.id }}">{{ user.group.name }}</a>
+      {% else %}
+        <b>{{ user.group.name }}</b>
+      {% endif %}
     {% else %}
       <b>нет</b>
     {% endif %}
@@ -19,6 +23,6 @@
 
     Зарегистрирован <b>{{ user.registration_date.strftime("%d.%m.%Y") }}</b>
     <br>
-    Задач решено: <b>{{ user.problems_solved|length }}</b>
+    Задач решено: <b>{{ user.solved_problems|length }}</b>
   </div>
 {% endblock %}
