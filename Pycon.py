@@ -58,7 +58,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     session = db_session.create_session()
-    news = session.query(News).all()
+    news = session.query(News).order_by(News.publication_date.desc()).all()
 
     return render_template('index.html', title='Pycon', news=news)
 
