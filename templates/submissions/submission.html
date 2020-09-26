@@ -16,6 +16,9 @@
     Задача: <a href="/problems/{{ submission.problem.id }}">{{ submission.problem.name }}</a>
     <br><br>
     Отправитель: <a href="/users/{{ submission.submitter.id }}">{{ submission.submitter.login }}</a>
+    <br><br>
+    Язык: <b>{{ languages[submission.language].display_name }}</b>
+    <br><br>
 
     <div class="normal-block">
       <textarea id="solution-text"></textarea>
@@ -49,6 +52,7 @@
     Время: <b>{{ submission.time if submission.time else 0 }} ms</b>
     <br><br>
     Память: <b>INOP</b>
+
   </div>
 
   <script type="text/javascript">

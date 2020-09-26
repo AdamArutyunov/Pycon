@@ -26,6 +26,7 @@ from forms.group_add_user import GroupAddUserForm
 from forms.create_news import CreateNewsForm
 from SolutionChecker import SolutionChecker
 from Constants import *
+from lib.Languages import *
 
 
 app = Flask(__name__)
@@ -233,7 +234,7 @@ def submission(submission_id):
         abort(403)
 
     return render_template('submissions/submission.html', title=f"Посылка №{submission.id}",
-                           submission=submission)
+                           submission=submission, languages=language_association)
 
 
 @app.route('/all_submissions')
