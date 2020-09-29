@@ -87,7 +87,8 @@ def register():
 
         login_user(user)
         
-        return redirect('/login')
+        return redirect('/')
+
     return render_template('user/register.html', title='Регистрация', form=form)
 
 
@@ -104,6 +105,7 @@ def login():
         return render_template('user/login.html',
                                message="Неправильный логин или пароль.",
                                form=form)
+
     return render_template('user/login.html', title='Авторизация', form=form)
 
 
