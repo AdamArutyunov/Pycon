@@ -54,7 +54,6 @@ class SolutionChecker:
     def check_solution(self, submission):
         session = db_session.create_session()
         
-        test_solution = submission.data
         submitter = submission.submitter
         problem = submission.problem
         solution = submission.data
@@ -68,6 +67,8 @@ class SolutionChecker:
             TestChecker = PythonTestChecker
         elif language.id == 2:
             TestChecker = CSharpTestChecker
+
+        TestChecker.compile(solution, time_limit, memory_limit)
 
         for test in tests:
             submission.set_current_test(test)
@@ -84,12 +85,14 @@ class SolutionChecker:
 
 class PythonTestChecker:
     @staticmethod
+    def compile(solution, time_limit, memory_limit):
+        with open('temp/solution.py', 'w+') as f:
+            f.write(solution)
+
+    @staticmethod
     def check_test(test, solution, time_limit, memory_limit):
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
-
-        with open('temp/solution.py', 'w+') as f:
-            f.write(solution)
 
         start_time = time()
         try:
@@ -121,10 +124,7 @@ class PythonTestChecker:
 
 class CSharpTestChecker:
     @staticmethod
-    def check_test(test, solution, time_limit, memory_limit):
-        with open('temp/input.txt', 'w+') as f:
-            f.write(test.input_data)
-
+    def compile(solution, time_limit, memory_limit):
         with open('temp/solution.cs', 'w+') as f:
             f.write(solution)
 
@@ -136,6 +136,11 @@ class CSharpTestChecker:
             return CompilationErrorVerdict()
         except subprocess.TimeoutExpired:
             return CompilationErrorVerdict()
+
+    @staticmethod
+    def check_test(test, solution, time_limit, memory_limit):
+        with open('temp/input.txt', 'w+') as f:
+            f.write(test.input_data)
 
         start_time = time()
         try:
