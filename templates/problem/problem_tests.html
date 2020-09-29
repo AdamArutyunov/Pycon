@@ -16,9 +16,13 @@
       {% for test in problem.tests %}
         <h4>
           #{{ test.number }}
+          <a class="alert-admin edit-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/edit">
+            ✏
+          </a>
           <a class="alert-danger delete-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/remove">
             ×
           </a>
+
         </h4>
         <div class="example">
           <div class="example-input">

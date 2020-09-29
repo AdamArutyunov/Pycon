@@ -172,6 +172,39 @@ def problem_create_test(problem_id):
                            form=form)
 
 
+@blueprint.route('/<int:problem_id>/tests/<int:test_id>/edit', methods=["GET", "POST"])
+@login_required
+@admin_required
+def problem_edit_test(problem_id, test_id):
+    session = db_session.create_session()
+    problem = session.query(Problem).get(problem_id)
+    test = session.query(Test).get(test_id)
+
+    if not problem or not test:
+        abort(404)
+
+    if test.problem is not problem:
+        abort(404)
+
+    form = CreateTestForm()
+    if form.validate_on_submit():
+        test.number = len(problem.tests) + 1
+        test.input_data = form.input_data.data.replace('\r', '')
+        test.output_data = form.output_data.data.replace('\r', '')
+        test.example = form.example.data
+
+        session.commit()
+
+        return redirect(f'../../tests')
+
+    form.input_data.data = test.input_data
+    form.output_data.data = test.output_data
+    form.example.data = test.example
+
+    return render_template('problem/create_test.html', title="Редактировать тест",
+                           form=form)
+
+
 @blueprint.route('/<int:problem_id>/tests/<int:test_id>/remove')
 @login_required
 @admin_required

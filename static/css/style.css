@@ -435,6 +435,15 @@ table a {
   font-size: 20pt;
 }
 
+.edit-test-button {
+  border: none;
+  position: absolute;
+  top: -5.5px;
+  left: 53px;
+  font-size: 15pt;
+  color: #3300aa;
+}
+
 .problem-status {
   position: absolute;
   z-index: -1;
