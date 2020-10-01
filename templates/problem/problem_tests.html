@@ -15,7 +15,7 @@
     <div class="content-block" id="tests">
       {% for test in problem.tests %}
         <h4>
-          #{{ test.number }}
+          #{{ loop.index }}
           <a class="alert-admin edit-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/edit">
             ✏
           </a>

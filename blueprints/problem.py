@@ -158,7 +158,6 @@ def problem_create_test(problem_id):
     form = CreateTestForm()
     if form.validate_on_submit():
         test = Test()
-        test.number = len(problem.tests) + 1
         test.input_data = form.input_data.data.replace('\r', '')
         test.output_data = form.output_data.data.replace('\r', '')
         test.example = form.example.data
@@ -188,7 +187,6 @@ def problem_edit_test(problem_id, test_id):
 
     form = CreateTestForm()
     if form.validate_on_submit():
-        test.number = len(problem.tests) + 1
         test.input_data = form.input_data.data.replace('\r', '')
         test.output_data = form.output_data.data.replace('\r', '')
         test.example = form.example.data

@@ -70,8 +70,8 @@ class SolutionChecker:
 
         TestChecker.compile(solution, time_limit, memory_limit)
 
-        for test in tests:
-            submission.set_current_test(test)
+        for i, test in enumerate(tests):
+            submission.set_current_test(i)
             session.commit()
 
             verdict = TestChecker.check_test(test, solution, time_limit, memory_limit)
