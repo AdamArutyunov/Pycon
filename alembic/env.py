@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, 'C:/Users/Adam/Desktop/Bce/Pycon')
+sys.path.insert(0, '/home/user/Pycon')
 
 from logging.config import fileConfig
 

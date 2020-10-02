@@ -95,15 +95,17 @@ class PythonTestChecker:
 
         start_time = time()
         try:
+            print(1)
             run = subprocess.Popen([PYTHON_COMMAND, "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
                                    stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'))
             proc = psutil.Process(run.pid)
 
+            print(2)
             if os.name == "posix":
                 proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
-            print(run.communicate())
+            print(3)
             proc.wait(timeout=time_limit)
-
+            print(4)
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
 
@@ -115,6 +117,8 @@ class PythonTestChecker:
             error = open('temp/error.txt').read().strip().split('\n')[-1].split(':')[0]
             if error == 'SyntaxError':
                 return CompilationErrorVerdict()
+            elif error == 'MemoryError':
+                return MemoryLimitVerdict(time=process_time)
             return RuntimeErrorVerdict(time=process_time)
         except psutil.TimeoutExpired:
             proc.kill()
