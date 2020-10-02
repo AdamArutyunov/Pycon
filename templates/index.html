@@ -5,11 +5,9 @@
   <br>
   Добро пожаловать на <b>Pycon</b> — площадку для обучения программированию на Python и C#.
   <br><br>
-  Здесь есть <a href="/problems">задачи</a> и <a href="/contests">контесты</a>.
+  Чтобы решать <a href="/problems">задачи</a> и принимать участие в <a href="/contests">контестах</a>, вам нужно <a href="/login">войти в систему</a>,<br>а если нет аккаунта — <a href="/register">зарегистрироваться</a>.
   <br><br>
-  Чтобы принимать участие в контестах, вам нужно <a href="/login">войти в систему</a>, а если нет аккаунта — <a href="/register">зарегистрироваться</a>.
-  <br><br>
-  Сейчас платформа находится в стадии тестирования. <a>Обратная связь</a>
+  Сейчас платформа находится в стадии тестирования. Оставить обратную связь можно <a onclick="alert('Пока нельзя! :—)')">здесь</a>.
   <br><br>
 
   {% if current_user.is_authenticated and current_user.is_admin() %}
@@ -33,7 +31,31 @@
           {{ new.body|safe }}
           <div style="height: 20px;"></div>
 
+          <div class="news-rating">
+          {% if current_user.is_authenticated %}
+            {% set user_rating = current_user.get_news_rate(new) %}
+            {% if user_rating == None %}
+              <a class="rating-button rate-up-button" id="rate-up-{{ new.id }}" onclick="rate_news({{ new.id }}, 1)">▲</a>
+              <span id="rating-counter-{{ new.id }}">{{ new.rating }}</span>
+              <a class="rating-button rate-down-button" id="rate-down-{{ new.id }}" onclick="rate_news({{ new.id }}, -1)">▼</a>
+            {% elif user_rating == 1 %}
+              <a class="rating-button rate-up-button rating-up" id="rate-up-{{ new.id }}" onclick="unrate_news({{ new.id }})">▲</a>
+              <span id="rating-counter-{{ new.id }}">{{ new.rating }}</span>
+              <a class="rating-button rate-down-button" id="rate-down-{{ new.id }}" onclick="rate_news({{ new.id }}, -1)">▼</a>
+            {% elif user_rating == -1 %}
+              <a class="rating-button rate-up-button" id="rate-up-{{ new.id }}" onclick="rate_news({{ new.id }}, 1)">▲</a>
+              <span id="rating-counter-{{ new.id }}">{{ new.rating }}</span>
+              <a class="rating-button rate-down-button rating-down" id="rate-down-{{ new.id }}" onclick="unrate_news({{ new.id }})">▼</a>
+            {% endif %}
+          {% else %}
+            <a class="rating-button rate-disabled-button">▲</a>
+            <span id="rating-counter-{{ new.id }}">{{ new.rating }}</span>
+            <a class="rating-button rate-disabled-button">▼</a>
+          {% endif %}
+          </div>
+
           {% if current_user.is_authenticated and current_user.is_admin() %}
+            <br>
             <a href="/news/{{ new.id }}/edit" class="alert-admin">Редактировать</a>
             &nbsp;&nbsp;&nbsp;
             <a href="/news/{{ new.id }}/delete" class="alert-admin">Удалить</a>

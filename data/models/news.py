@@ -1,5 +1,4 @@
 import datetime
-import sqlalchemy
 import sqlalchemy.orm as orm
 from sqlalchemy import *
 from sqlalchemy_serializer import SerializerMixin
@@ -15,3 +14,4 @@ class News(SqlAlchemyBase, SerializerMixin):
     author = orm.relation("User")
     title = Column(String, nullable=False)
     body = Column(String, nullable=False)
+    rating = Column(Integer, nullable=True, default=0)

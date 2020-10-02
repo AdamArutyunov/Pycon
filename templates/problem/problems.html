@@ -29,9 +29,9 @@
         {% for problem in problems %}
           <tr>
               <td class="id-td">
-              {% if problem in current_user.solved_problems %}
+              {% if current_user.is_authenticated and current_user.is_problem_solved(problem) == True %}
                 <div class="problem-status solved-problem-div">
-              {% elif problem in current_user.unsolved_problems %}
+              {% elif current_user.is_authenticated and current_user.is_problem_solved(problem) == False %}
                 <div class="problem-status unsolved-problem-div">
               {% endif %}
               </div>

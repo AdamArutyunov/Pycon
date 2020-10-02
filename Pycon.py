@@ -9,7 +9,6 @@ from data.models.user import *
 from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
-from forms.create_news import CreateNewsForm
 from SolutionChecker import SolutionChecker
 from lib.Languages import *
 
@@ -123,6 +122,7 @@ if __name__ == '__main__':
     import blueprints.group
     import blueprints.news
     import blueprints.user
+    import blueprints.api
 
     os.chdir(APP_ROOT)
     db_session.global_init(app.config['DATABASE_URI'])
@@ -134,5 +134,6 @@ if __name__ == '__main__':
     app.register_blueprint(blueprints.group.blueprint, url_prefix='/groups')
     app.register_blueprint(blueprints.news.blueprint, url_prefix='/news')
     app.register_blueprint(blueprints.user.blueprint, url_prefix='/users')
+    app.register_blueprint(blueprints.api.blueprint, url_prefix='/api')
 
     app.run(port=APP_PORT, host='0.0.0.0')

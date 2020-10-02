@@ -492,6 +492,39 @@ table a {
   margin: 20px 0;
 }
 
+.news-rating {
+  margin: 20px 0 0 0;
+  font-size: 25px;
+  font-weight: normal;
+  font-family: "Consolas";
+}
+
+.rating-button {
+  border: none;
+  cursor: pointer;
+  color: var(--light-grey);
+}
+
+.rating-up {
+  color: #40AA3B;
+}
+
+.rating-down {
+  color: #DD0000;
+}
+
+.rate-up-button:hover {
+  color: #40AA3B;
+}
+
+.rate-down-button:hover {
+  color: #DD0000;
+}
+
+.rate-disabled-button:hover {
+  color: var(--light-grey);
+}
+
 #limits {
   color: var(--light-grey);
 }

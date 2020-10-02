@@ -1,11 +1,11 @@
 import datetime
-import sqlalchemy
 import sqlalchemy.orm as orm
 from sqlalchemy import *
 from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..db_session import SqlAlchemyBase
+from .. import db_session
 
 
 class UserToContest(SqlAlchemyBase):
@@ -24,6 +24,15 @@ class UserToProblem(SqlAlchemyBase):
     problem = orm.relation('Problem', backref=orm.backref('users', lazy='joined', cascade='all'))
     solved = Column(Boolean, nullable=False)
     submissions = Column(Integer, default=1)
+
+
+class UserToNews(SqlAlchemyBase):
+    __tablename__ = 'user_to_news'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user = orm.relation('User', backref=orm.backref('news_rated', lazy='joined', cascade='all'))
+    news_id = Column(Integer, ForeignKey('news.id'), primary_key=True)
+    news = orm.relation('News', backref=orm.backref('users_rated', lazy='joined', cascade='all'))
+    rate = Column(Integer, nullable=True)
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -52,11 +61,17 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     @property
     def solved_problems(self):
-        return list(map(lambda x: x.problem, filter(lambda x: x.solved, self.problems)))
+        session = db_session.create_session()
+        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
+                                                                    (UserToProblem.solved == True)).all()
+        return problem_associations
 
     @property
     def unsolved_problems(self):
-        return list(map(lambda x: x.problem, filter(lambda x: not x.solved, self.problems)))
+        session = db_session.create_session()
+        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
+                                                                    (UserToProblem.solved == False)).all()
+        return problem_associations
 
     def solve_problem(self, problem):
         problem_association = self.get_problem_association(problem)
@@ -81,21 +96,25 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         else:
             problem_association.submissions += 1
 
-    def get_problem_association(self, problem):
-        problem_associations = list(filter(lambda x: x.problem == problem, self.problems))
+    def is_problem_solved(self, problem):
+        problem_association = self.get_problem_association(problem)
 
-        if not problem_associations:
+        if not problem_association:
             return
 
-        return problem_associations[0]
+        return problem_association.solved
+
+    def get_problem_association(self, problem):
+        session = db_session.create_session()
+        problem_association = session.query(UserToProblem).get((self.id, problem.id))
+
+        return problem_association
 
     def get_contest_association(self, contest):
-        contest_associations = list(filter(lambda x: x.contest == contest, self.contests))
+        session = db_session.create_session()
+        contest_association = session.query(UserToContest).get((self.id, contest.id))
 
-        if not contest_associations:
-            return
-
-        return contest_associations[0]
+        return contest_association
 
     def get_solved_contest_problems_count(self, contest):
         solved_problems_count = 0
@@ -108,10 +127,59 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return solved_problems_count
 
     def join_contest(self, contest):
-        contests = list(map(lambda x: x.contest, self.contests))
-        if contest in contests or contest.is_finished():
+        session = db_session.create_session()
+        contest_association = session.query(UserToContest).get((self.id, contest.id))
+
+        if contest_association or contest.is_finished():
             return
         
         contest_association = UserToContest()
         contest_association.contest = contest
         self.contests.append(contest_association)
+
+    def rate_news(self, news, rate):
+        session = db_session.create_session()
+
+        news_rate_association = session.query(UserToNews).get((self.id, news.id))
+
+        if news_rate_association:
+            news.rating -= news_rate_association.rate
+            news_rate_association.rate = rate
+            news.rating += rate
+
+            session.commit()
+            return
+
+        news_rate_association = UserToNews()
+        news_rate_association.user = self
+        news_rate_association.news = news
+        news_rate_association.rate = rate
+
+        news.rating += rate
+
+        session.add(news_rate_association)
+        session.commit()
+
+    def unrate_news(self, news):
+        session = db_session.create_session()
+
+        news_rate_association = session.query(UserToNews).get((self.id, news.id))
+
+        if not news_rate_association:
+            return
+
+        news.rating -= news_rate_association.rate
+        session.delete(news_rate_association)
+
+        session.commit()
+
+    def get_news_rate(self, news):
+        session = db_session.create_session()
+
+        news_rate_association = session.query(UserToNews).get((self.id, news.id))
+
+        if not news_rate_association:
+            return
+
+        return news_rate_association.rate
+

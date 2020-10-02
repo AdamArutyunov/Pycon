@@ -1,9 +1,9 @@
-import datetime
-import sqlalchemy
 import sqlalchemy.orm as orm
 from sqlalchemy import *
 from sqlalchemy_serializer import SerializerMixin
 from ..db_session import SqlAlchemyBase
+from .. import db_session
+from .user import UserToProblem
 
 
 class Problem(SqlAlchemyBase, SerializerMixin):
@@ -20,12 +20,19 @@ class Problem(SqlAlchemyBase, SerializerMixin):
 
     @property
     def users_solved(self):
-        return list(map(lambda x: x.user, filter(lambda x: x.solved, self.users)))
+        session = db_session.create_session()
+        user_associations = session.query(UserToProblem).filter((UserToProblem.problem == self) and
+                                                                (UserToProblem.solved == True)).all()
+        return user_associations
     
     @property
     def users_unsolved(self):
-        return list(map(lambda x: x.user, filter(lambda x: not x.solved, self.users)))
+        session = db_session.create_session()
+        user_associations = session.query(UserToProblem).filter((UserToProblem.problem == self) and
+                                                                (UserToProblem.solved == False)).all()
+        return user_associations
 
     @property
     def examples(self):
+        # Должно быть обдумано
         return list(filter(lambda x: x.example, self.tests))
