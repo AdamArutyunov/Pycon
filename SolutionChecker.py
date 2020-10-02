@@ -65,7 +65,10 @@ class SolutionChecker:
         elif language.id == 2:
             TestChecker = CSharpTestChecker
 
-        TestChecker.compile(solution, time_limit, memory_limit)
+        compilation_verdict = TestChecker.compile(solution, time_limit, memory_limit)
+        if compilation_verdict:
+            submitter.unsolve_problem(problem)
+            return compilation_verdict
 
         for i, test in enumerate(tests):
             submission.set_current_test(i + 1)
@@ -95,17 +98,15 @@ class PythonTestChecker:
 
         start_time = time()
         try:
-            print(1)
             run = subprocess.Popen([PYTHON_COMMAND, "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
                                    stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'))
             proc = psutil.Process(run.pid)
 
-            print(2)
             if os.name == "posix":
                 proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
-            print(3)
+
             proc.wait(timeout=time_limit)
-            print(4)
+
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
 

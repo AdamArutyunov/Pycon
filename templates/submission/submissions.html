@@ -77,7 +77,7 @@
                 </span>
               {% else %}
                 <span class="verdict-bad" title="{{ verdict_labels[submission.verdict] }}"">
-                  {{ submission.verdict }} #{{ submission.test }}
+                  {{ submission.verdict }} {{ "#" + submission.test|string if submission.test }}
                 </span>
               {% endif %}
             </td>
