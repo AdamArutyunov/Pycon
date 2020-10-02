@@ -1,12 +1,9 @@
-import sys
 import os
-import shutil
 import subprocess
+import psutil
 from time import time
-from random import randint
 from data import db_session
 from data.models.submission import Submission
-from sqlalchemy.orm import scoped_session
 from flask_login import current_user
 from Constants import *
 from lib.Verdicts import *
@@ -24,7 +21,7 @@ class SolutionChecker:
         session = db_session.create_session()
         user = session.merge(current_user)
         problem = session.merge(problem)
-        
+
         submission = Submission()
         submission.submitter = user
         submission.problem = problem
@@ -53,7 +50,7 @@ class SolutionChecker:
 
     def check_solution(self, submission):
         session = db_session.create_session()
-        
+
         submitter = submission.submitter
         problem = submission.problem
         solution = submission.data
@@ -71,7 +68,7 @@ class SolutionChecker:
         TestChecker.compile(solution, time_limit, memory_limit)
 
         for i, test in enumerate(tests):
-            submission.set_current_test(i)
+            submission.set_current_test(i + 1)
             session.commit()
 
             verdict = TestChecker.check_test(test, solution, time_limit, memory_limit)
@@ -91,17 +88,27 @@ class PythonTestChecker:
 
     @staticmethod
     def check_test(test, solution, time_limit, memory_limit):
+        MAX_MEMORY = memory_limit * 1024 * 1024
+
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
 
         start_time = time()
         try:
-            run = subprocess.run([PYTHON_COMMAND, "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
-                           stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
-                           timeout=time_limit)
+            run = subprocess.Popen([PYTHON_COMMAND, "temp/solution.py"], stdin=open('temp/input.txt', 'r'),
+                                   stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'))
+            proc = psutil.Process(run.pid)
+
+            if os.name == "posix":
+                proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
+            print(run.communicate())
+            proc.wait(timeout=time_limit)
+
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
-            run.check_returncode()
+
+            if open("temp/error.txt").read():
+                raise subprocess.CalledProcessError(-1, PYTHON_COMMAND)
         except subprocess.CalledProcessError as e:
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
@@ -109,18 +116,19 @@ class PythonTestChecker:
             if error == 'SyntaxError':
                 return CompilationErrorVerdict()
             return RuntimeErrorVerdict(time=process_time)
-        except subprocess.TimeoutExpired:
+        except psutil.TimeoutExpired:
+            proc.kill()
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
             return TimeLimitVerdict(time=process_time)
-        
+
         with open('temp/output.txt') as f:
             output = f.read().strip()
 
         if output == test.output_data:
             return OKVerdict(time=process_time)
         return WrongAnswerVerdict(time=process_time)
-        
+
 
 class CSharpTestChecker:
     @staticmethod
