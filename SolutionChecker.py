@@ -92,6 +92,7 @@ class PythonTestChecker:
     @staticmethod
     def check_test(test, solution, time_limit, memory_limit):
         MAX_MEMORY = memory_limit * 1024 * 1024
+        verdict = None
 
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
@@ -107,74 +108,114 @@ class PythonTestChecker:
 
             proc.wait(timeout=time_limit)
 
-            end_time = time()
-            process_time = int((end_time - start_time) * 1000)
+            run.communicate()
 
-            if open("temp/error.txt").read():
+            if run.returncode:
                 raise subprocess.CalledProcessError(-1, PYTHON_COMMAND)
         except subprocess.CalledProcessError as e:
-            end_time = time()
-            process_time = int((end_time - start_time) * 1000)
             error = open('temp/error.txt').read().strip().split('\n')[-1].split(':')[0]
             if error == 'SyntaxError':
                 return CompilationErrorVerdict()
-            elif error == 'MemoryError':
-                return MemoryLimitVerdict(time=process_time)
-            return RuntimeErrorVerdict(time=process_time)
+            if error == 'MemoryError':
+                verdict = MemoryLimitVerdict
+            else:
+                verdict = RuntimeErrorVerdict
         except psutil.TimeoutExpired:
             proc.kill()
+            verdict = TimeLimitVerdict
+        finally:
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
-            return TimeLimitVerdict(time=process_time)
+
+            if verdict:
+                return verdict(time=process_time)
 
         with open('temp/output.txt') as f:
             output = f.read().strip()
 
         if output == test.output_data:
-            return OKVerdict(time=process_time)
-        return WrongAnswerVerdict(time=process_time)
+            verdict = OKVerdict
+        else:
+            verdict = WrongAnswerVerdict
+
+        return verdict(time=process_time)
 
 
 class CSharpTestChecker:
     @staticmethod
     def compile(solution, time_limit, memory_limit):
+        MAX_MEMORY = memory_limit * 1024 * 1024
+        verdict = None
+
         with open('temp/solution.cs', 'w+') as f:
             f.write(solution)
 
+        start_time = time()
         try:
-            run = subprocess.run([CSHARP_COMPILE_COMMAND, "temp/solution.cs"],
-                                 timeout=time_limit)
-            run.check_returncode()
+            run = subprocess.Popen([CSHARP_COMPILE_COMMAND, "temp/solution.cs"], stdin=open('temp/input.txt', 'r'),
+                                   stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'))
+            proc = psutil.Process(run.pid)
+
+            if os.name == "posix":
+                proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
+
+            proc.wait(timeout=time_limit)
+
+            run.communicate()
+
+            if run.returncode:
+                raise subprocess.CalledProcessError(-1, CSHARP_COMPILE_COMMAND)
         except subprocess.CalledProcessError as e:
-            return CompilationErrorVerdict()
-        except subprocess.TimeoutExpired:
-            return CompilationErrorVerdict()
+            verdict = CompilationErrorVerdict
+        except psutil.TimeoutExpired:
+            proc.kill()
+            verdict = CompilationErrorVerdict
+        finally:
+            if verdict:
+                return verdict()
 
     @staticmethod
     def check_test(test, solution, time_limit, memory_limit):
+        MAX_MEMORY = memory_limit * 1024 * 1024
+        verdict = None
+
         with open('temp/input.txt', 'w+') as f:
             f.write(test.input_data)
 
         start_time = time()
         try:
-            run = subprocess.run([CSHARP_RUN_COMMAND, "temp/solution.exe"], stdin=open('temp/input.txt', 'r'),
-                                 stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'),
-                                 timeout=time_limit)
-            end_time = time()
-            process_time = int((end_time - start_time) * 1000)
-            run.check_returncode()
+            run = subprocess.Popen([CSHARP_RUN_COMMAND, "temp/solution.exe"], stdin=open('temp/input.txt', 'r'),
+                                   stdout=open('temp/output.txt', 'w+'), stderr=open('temp/error.txt', 'w+'))
+
+            proc = psutil.Process(run.pid)
+
+            if os.name == "posix":
+                proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
+
+            proc.wait(timeout=time_limit)
+
+            run.communicate()
+
+            if run.returncode:
+                raise subprocess.CalledProcessError(-1, CSHARP_RUN_COMMAND)
         except subprocess.CalledProcessError as e:
+            verdict = RuntimeErrorVerdict
+        except psutil.TimeoutExpired:
+            proc.kill()
+            verdict = TimeLimitVerdict
+        finally:
             end_time = time()
             process_time = int((end_time - start_time) * 1000)
-            return RuntimeErrorVerdict(time=process_time)
-        except subprocess.TimeoutExpired:
-            end_time = time()
-            process_time = int((end_time - start_time) * 1000)
-            return TimeLimitVerdict(time=process_time)
+
+            if verdict:
+                return verdict(process_time)
 
         with open('temp/output.txt') as f:
             output = f.read().strip()
 
         if output == test.output_data:
-            return OKVerdict(time=process_time)
-        return WrongAnswerVerdict(time=process_time)
+            verdict = OKVerdict
+        else:
+            verdict = WrongAnswerVerdict
+
+        return verdict(time=process_time)
