@@ -47,6 +47,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     role = Column(Integer, default=0)
     submissions = orm.relation("Submission", back_populates='submitter')
     registration_date = Column(DateTime, default=datetime.datetime.now)
+    userpic_uri = Column(String, nullable=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

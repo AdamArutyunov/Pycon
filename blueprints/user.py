@@ -1,8 +1,12 @@
+import os
 from Pycon import admin_required
 from flask import Blueprint, render_template, abort, redirect
 from flask_login import login_required, current_user
 from data import db_session
 from data.models.user import User
+from forms.upload_userpic import *
+from werkzeug.utils import secure_filename
+from Constants import *
 
 blueprint = Blueprint('user', __name__, template_folder='/templates/users')
 
@@ -19,7 +23,7 @@ def users():
                            users=users)
 
 
-@blueprint.route('/<int:user_id>')
+@blueprint.route('/<int:user_id>', methods=["GET", "POST"])
 def user(user_id):
     session = db_session.create_session()
 
@@ -27,8 +31,31 @@ def user(user_id):
     if not user:
         abort(404)
 
+    form = UploadUserpicForm()
+    if form.validate_on_submit() and current_user == user:
+        file = form.image.data
+        filename = secure_filename(file.filename)
+
+        old_path = user.userpic_uri
+        if old_path:
+            try:
+                path = APP_ROOT + old_path
+                os.remove(path)
+            except Exception as e:
+                pass
+
+        short_folder = "/static/img/userpics"
+        short_path = os.path.join(short_folder, filename)
+
+
+        path = APP_ROOT + short_path
+        file.save(path)
+
+        user.userpic_uri = short_path
+        session.commit()
+
     return render_template('user/user.html', title=f"Профиль {user.login}",
-                           user=user)
+                           user=user, form=form)
 
 
 @blueprint.route('/<int:user_id>/delete')
@@ -45,3 +72,25 @@ def delete_user(user_id):
     session.commit()
 
     return redirect('..')
+
+
+@blueprint.route('/<int:user_id>/delete_userpic', methods=["GET", "POST"])
+def user_delete_userpic(user_id):
+    session = db_session.create_session()
+
+    user = session.query(User).get(user_id)
+    if not user:
+        abort(404)
+
+    path = user.userpic_uri
+    if path:
+        try:
+            path = APP_ROOT + path
+            os.remove(path)
+        except Exception as e:
+            pass
+
+    user.userpic_uri = None
+    session.commit()
+
+    return redirect(f"../{user.id}")
