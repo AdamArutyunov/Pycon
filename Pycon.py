@@ -1,4 +1,5 @@
 import os
+import datetime
 from flask import Flask, render_template, abort, redirect, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from multiprocessing import Process
@@ -9,6 +10,7 @@ from data.models.user import *
 from data.models.news import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
+from forms.feedback import *
 from SolutionChecker import SolutionChecker
 from lib.Languages import *
 
@@ -113,6 +115,30 @@ def login():
 def logout():
     logout_user()
     return redirect(request.args.get('next') or '/')
+
+
+@app.route('/feedback', methods=["GET", "POST"])
+def feedback():
+    form = FeedbackForm()
+
+    if form.validate_on_submit():
+        body = form.body.data
+        contact = form.response_contact.data
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        message = ""
+        message += "От: " + (current_user.login if current_user.is_authenticated else "аноним") + "\n\n"
+        message += body + "\n\n"
+
+        if contact:
+            message += "Контакт для связи: " + contact
+
+        with open(f"temp/feedback/feedback_{timestamp}.txt", "w") as f:
+            f.write(message)
+
+        return redirect("/")
+
+    return render_template("feedback.html", title="Обратная связь", form=form)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>
+    Обратная связь
+  </h2>
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+
+    <div class="normal-block">
+      <h3>
+        {{ form.body.label }}
+      </h3>
+      {{ form.body() }}<br>
+      {% for error in form.body.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.response_contact.label }}
+      </h3>
+      {{ form.response_contact(placeholder="Если ответ не нужен, оставьте поле пустым", class="static-input") }}<br>
+      {% for error in form.response_contact.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="small-block">
+      {{ form.submit(type="submit", onclick="alert('Ваше сообщение отправлено, спасибо.')") }}
+    </div>
+
+  </form>
+{% endblock %}
