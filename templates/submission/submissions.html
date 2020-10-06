@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 
-{% set verdict_labels = {"RE": "Ошибка исполнения",
-                         "CE": "Ошибка компиляции",
-                         "WA": "Неправильный ответ",
-                         "TL": "Превышение лимита времени",
-                         "ML": "Превышение лимита памяти"} %}
-
 {% block content %}
   <div class="content-header">
     <h2>
@@ -72,11 +66,11 @@
                   {% endif %}
                 </span>
               {% elif submission.verdict == 'OK' %}
-                <span class="verdict-good">
+                <span class="verdict-good" title="{{ VERDICTS[submission.verdict]().display_name }}">
                   {{ submission.verdict }}
                 </span>
               {% else %}
-                <span class="verdict-bad" title="{{ verdict_labels[submission.verdict] }}"">
+                <span class="verdict-bad" title="{{ VERDICTS[submission.verdict]().display_name }}">
                   {{ submission.verdict }} {{ "#" + submission.test|string if submission.test }}
                 </span>
               {% endif %}

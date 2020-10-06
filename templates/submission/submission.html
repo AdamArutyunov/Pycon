@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 
-{% set verdict_labels = {"RE": "Ошибка исполнения",
-                         "CE": "Ошибка компиляции",
-                         "WA": "Неправильный ответ",
-                         "TL": "Превышение лимита времени",
-                         "ML": "Превышение лимита памяти"} %}
-
 {% block content %}
   <div class="content-header">
     <h2>
@@ -17,7 +11,7 @@
     <br><br>
     Отправитель: <a href="/users/{{ submission.submitter.id }}">{{ submission.submitter.login }}</a>
     <br><br>
-    Язык: <b>{{ languages[submission.language].display_name }}</b>
+    Язык: <b>{{ LANGUAGES[submission.language].display_name }}</b>
     <br><br>
 
     <div class="normal-block">
@@ -41,10 +35,12 @@
       {% elif submission.verdict == 'OK' %}
         <span class="verdict-good">
           {{ submission.verdict }}
+          ({{ VERDICTS[submission.verdict]().display_name }})
         </span>
       {% else %}
         <span class="verdict-bad">
-          {{ submission.verdict }} #{{ submission.test }} ({{ verdict_labels[submission.verdict] }})
+          {{ submission.verdict }} {{ "#" + submission.test|string if submission.test else "" }}
+          ({{ VERDICTS[submission.verdict]().display_name }})
         </span>
       {% endif %}
     </b>

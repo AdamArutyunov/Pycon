@@ -59,7 +59,7 @@ class SolutionChecker:
         time_limit = problem.time_limit
         memory_limit = problem.memory_limit
 
-        language = language_association[submission_language]
+        language = LANGUAGES[submission_language]
         if language.id == 1:
             TestChecker = PythonTestChecker
         elif language.id == 2:

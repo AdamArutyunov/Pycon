@@ -7,8 +7,8 @@ from lib.Languages import *
 
 
 class SubmitForm(FlaskForm):
-    language = SelectField("Язык", coerce=int, choices=list(map(lambda x: (x.id, x.display_name),
-                                                                language_association[1:])))
+    language = SelectField("Язык", coerce=int,
+                           choices=list(map(lambda x: (x.id, x.display_name), LANGUAGES.values())))
     data = StringField(widget=TextArea())
     data_file = FileField()
     submit_button = SubmitField('Отправить')

@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from data import db_session
 from data.models.submission import Submission
 from forms.submit import *
+from lib.Verdicts import *
 
 blueprint = Blueprint('submission', __name__, template_folder='/templates/submission')
 
@@ -15,7 +16,7 @@ def submissions():
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
     return render_template('submission/submissions.html', title="Посылки",
-                           submissions=submissions)
+                           submissions=submissions, VERDICTS=VERDICTS)
 
 
 @blueprint.route('/all')
@@ -26,7 +27,7 @@ def submissions_all():
     submissions = session.query(Submission).order_by(Submission.id.desc()).all()
     
     return render_template('submission/submissions.html', title="Все посылки",
-                           submissions=submissions)
+                           submissions=submissions, VERDICTS=VERDICTS)
 
 
 @blueprint.route('/<int:submission_id>')
@@ -41,4 +42,4 @@ def submission(submission_id):
         abort(403)
 
     return render_template('submission/submission.html', title=f"Посылка №{submission.id}",
-                           submission=submission, languages=language_association)
+                           submission=submission, LANGUAGES=LANGUAGES, VERDICTS=VERDICTS)
