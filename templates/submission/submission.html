@@ -20,11 +20,11 @@
 
     Вердикт:
     <b>
-      {% if submission.verdict == None %}
+      {% if submission.verdict == 0 %}
         <span class="verdict-neutral">
           отправлено на проверку
         </span>
-      {% elif submission.verdict == 'TG' %}
+      {% elif submission.verdict == 1 %}
         <span class="verdict-neutral">
           {% if submission.test %}
             тестируется #{{ submission.test }}
@@ -32,14 +32,14 @@
             тестируется
           {% endif %}
         </span>
-      {% elif submission.verdict == 'OK' %}
+      {% elif submission.verdict == 2 %}
         <span class="verdict-good">
-          {{ submission.verdict }}
+          {{ VERDICTS[submission.verdict]().representation }}
           ({{ VERDICTS[submission.verdict]().display_name }})
         </span>
       {% else %}
         <span class="verdict-bad">
-          {{ submission.verdict }} {{ "#" + submission.test|string if submission.test else "" }}
+          {{ VERDICTS[submission.verdict]().representation }} {{ "#" + submission.test|string if submission.test else "" }}
           ({{ VERDICTS[submission.verdict]().display_name }})
         </span>
       {% endif %}

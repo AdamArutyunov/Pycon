@@ -34,7 +34,7 @@ class SolutionChecker:
     def parse(self):
         session = db_session.create_session()
         while True:
-            submissions = session.query(Submission).filter(Submission.verdict == None).all()
+            submissions = session.query(Submission).filter(Submission.verdict == 0).all()
             for submission in submissions:
                 submission.set_verdict(TestingVerdict())
                 session.commit()

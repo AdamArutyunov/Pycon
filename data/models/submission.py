@@ -17,13 +17,13 @@ class Submission(SqlAlchemyBase, SerializerMixin):
     data = Column(String, nullable=False)
     language = Column(Integer, nullable=False)
     submit_timestamp = Column(DateTime, default=datetime.datetime.now, nullable=False)
-    verdict = Column(String, nullable=True)
+    verdict = Column(Integer, nullable=False, default=0)
     test = Column(Integer, nullable=True)
     time = Column(Integer, nullable=True)  # Warning, time in ms!
     memory = Column(Integer, nullable=True)  # Warning, memory in KB!
 
     def set_verdict(self, verdict):
-        self.verdict = str(verdict)
+        self.verdict = verdict.id
         self.time = verdict.time
         self.memory = verdict.memory
 
