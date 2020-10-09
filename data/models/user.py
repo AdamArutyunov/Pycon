@@ -6,6 +6,7 @@ from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..db_session import SqlAlchemyBase
 from .. import db_session
+from lib.Roles import *
 
 
 class UserToContest(SqlAlchemyBase):
@@ -183,4 +184,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
             return
 
         return news_rate_association.rate
+
+    def get_role(self):
+        return ROLES[self.role]
+
+    def is_permitted(self, permission):
+        return self.get_role().is_permitted(permission)
 
