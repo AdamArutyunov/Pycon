@@ -53,11 +53,11 @@
               <a href="/problems/{{ submission.problem.id }}">{{ submission.problem.name }}</a>
             </td>
             <td class="verdict-td">
-              {% if submission.verdict == None %}
+              {% if submission.verdict == 0 %}
                 <span class="verdict-neutral">
                   Отправлено на проверку
                 </span>
-              {% elif submission.verdict == 'TG' %}
+              {% elif submission.verdict == 1 %}
                 <span class="verdict-neutral">
                   {% if submission.test %}
                     Тестируется #{{ submission.test }}
@@ -65,13 +65,13 @@
                     Тестируется
                   {% endif %}
                 </span>
-              {% elif submission.verdict == 'OK' %}
+              {% elif submission.verdict == 2 %}
                 <span class="verdict-good" title="{{ VERDICTS[submission.verdict]().display_name }}">
-                  {{ submission.verdict }}
+                  {{ VERDICTS[submission.verdict]().representation }}
                 </span>
               {% else %}
                 <span class="verdict-bad" title="{{ VERDICTS[submission.verdict]().display_name }}">
-                  {{ submission.verdict }} {{ "#" + submission.test|string if submission.test }}
+                  {{ VERDICTS[submission.verdict]().representation }} {{ "#" + submission.test|string if submission.test }}
                 </span>
               {% endif %}
             </td>
