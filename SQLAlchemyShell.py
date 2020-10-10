@@ -8,12 +8,12 @@ from data.models.user import *
 from data.models.group import Group
 from data.models.news import *
 from Constants import *
+from lib.Roles import *
 
 db_session.global_init(DATABASE_URI)
 session = db_session.create_session()
 
 
-news = session.query(News).all()
-for new in news:
-    new.rating = 0
+user = session.query(User).get(3)
+user.role = UserRole.id
 session.commit()

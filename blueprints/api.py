@@ -1,13 +1,15 @@
+from Pycon import permission_required
 from flask import Blueprint, request
-from flask_login import login_required, current_user
+from flask_login import current_user
 from data import db_session
 from data.models.news import News
+from lib.Permissions import *
 
 blueprint = Blueprint('api', __name__)
 
 
-@login_required
 @blueprint.route('/rate_news', methods=["POST"])
+@permission_required(Permissions.NEWS_RATE)
 def rate_news():
     news_id, rate = request.json.get("news_id"), request.json.get("rate")
 
@@ -24,8 +26,8 @@ def rate_news():
     return {"status": "OK", "new_rating": news.rating}
 
 
-@login_required
 @blueprint.route('/unrate_news', methods=["POST"])
+@permission_required(Permissions.NEWS_UNRATE)
 def unrate_news():
     news_id = request.json.get("news_id")
 

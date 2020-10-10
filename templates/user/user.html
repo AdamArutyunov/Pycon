@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h3 {% if user.is_admin() %}class="alert-admin"{% endif %}>
-    {% if user.is_admin() %}Администратор{% else %}Пользователь{% endif %}
+  <h3 style="color: {{ user.get_role().color }}">
+    {{ user.get_role().display_name }}
   </h3>
-  <h1 {% if user.is_admin() %}class="alert-admin"{% endif %} style="font-size: 80pt">{{ user.login }}</h1>
+  <h1 class="" style="color: {{ user.get_role().color }}; font-size: 80pt">
+    {{ user.login }}
+  </h1>
 
   <img src="{{ user.userpic_uri }}" style="width: 300px; height: 300px; margin: 20px 0;"
        onerror="this.parentElement.removeChild(this);">

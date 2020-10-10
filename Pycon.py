@@ -13,6 +13,8 @@ from forms.login import LoginForm
 from forms.feedback import *
 from SolutionChecker import SolutionChecker
 from lib.Languages import *
+from lib.Permissions import *
+from lib.Roles import *
 
 
 app = Flask(__name__)
@@ -27,6 +29,32 @@ PyconSolutionChecker = SolutionChecker()
 PyconSolutionCheckerProcess = Process(target=PyconSolutionChecker.parse)
 
 
+class PyconAnonymousUser:
+    @property
+    def is_active(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return False
+
+    @property
+    def is_anonymous(self):
+        return True
+
+    def get_id(self):
+        return None
+
+    def get_role(self):
+        return ObserverRole
+
+    def is_permitted(self, permission):
+        return self.get_role().is_permitted(permission)
+
+
+login_manager.anonymous_user = PyconAnonymousUser
+
+
 def admin_required(func):
     @wraps(func)
     def new_func(*args, **kwargs):
@@ -36,6 +64,19 @@ def admin_required(func):
     return new_func
 
 
+def permission_required(permission):
+    def inner_decorator(func):
+        @wraps(func)
+        def new_func(*args, **kwargs):
+            if current_user.is_permitted(permission):
+                return func(*args, **kwargs)
+            if not current_user.is_authenticated:
+                return redirect("/login")
+            abort(403)
+        return new_func
+    return inner_decorator
+
+
 @login_manager.user_loader
 def load_user(user_id):
     session = db_session.create_session()
@@ -43,6 +84,7 @@ def load_user(user_id):
 
 
 @app.route('/')
+@permission_required(Permissions.INDEX_VIEW)
 def index():
     session = db_session.create_session()
     news = session.query(News).order_by(News.publication_date.desc()).all()
@@ -118,6 +160,7 @@ def logout():
 
 
 @app.route('/feedback', methods=["GET", "POST"])
+@permission_required(Permissions.FEEDBACK_LEAVE)
 def feedback():
     form = FeedbackForm()
 

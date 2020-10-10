@@ -1,19 +1,20 @@
 import os
-from Pycon import admin_required
+from Pycon import permission_required
 from flask import Blueprint, render_template, abort, redirect
-from flask_login import login_required, current_user
+from flask_login import current_user
 from data import db_session
 from data.models.user import User
 from forms.upload_userpic import *
 from werkzeug.utils import secure_filename
 from Constants import *
+from lib.Permissions import *
+from lib.Roles import *
 
 blueprint = Blueprint('user', __name__, template_folder='/templates/users')
 
 
 @blueprint.route('/')
-@login_required
-@admin_required
+@permission_required(Permissions.USERS_VIEW)
 def users():
     session = db_session.create_session()
 
@@ -24,12 +25,16 @@ def users():
 
 
 @blueprint.route('/<int:user_id>', methods=["GET", "POST"])
+@permission_required(Permissions.USER_VIEW)
 def user(user_id):
     session = db_session.create_session()
 
     user = session.query(User).get(user_id)
     if not user:
         abort(404)
+
+    if not (user == current_user or current_user.get_role() == AdminRole):
+        abort(403)
 
     form = UploadUserpicForm()
     if form.validate_on_submit() and current_user == user:
@@ -59,8 +64,7 @@ def user(user_id):
 
 
 @blueprint.route('/<int:user_id>/delete')
-@login_required
-@admin_required
+@permission_required(Permissions.USER_DELETE)
 def delete_user(user_id):
     session = db_session.create_session()
     user = session.query(User).get(user_id)
@@ -75,12 +79,16 @@ def delete_user(user_id):
 
 
 @blueprint.route('/<int:user_id>/delete_userpic', methods=["GET", "POST"])
+@permission_required(Permissions.USER_DELETE_USERPIC)
 def user_delete_userpic(user_id):
     session = db_session.create_session()
 
     user = session.query(User).get(user_id)
     if not user:
         abort(404)
+
+    if not (user == current_user or current_user.get_role() == AdminRole):
+        abort(403)
 
     path = user.userpic_uri
     if path:

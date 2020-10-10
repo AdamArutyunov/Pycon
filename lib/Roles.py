@@ -26,7 +26,8 @@ class BannedRole(Role):
 class ObserverRole(Role):
     id = 1
     permissions = (Permissions.INDEX_VIEW | Permissions.PROBLEMS_VIEW | Permissions.PROBLEM_VIEW |
-                   Permissions.CONTESTS_VIEW | Permissions.CONTEST_VIEW | Permissions.CONTEST_VIEW_STANDINGS)
+                   Permissions.CONTESTS_VIEW | Permissions.CONTEST_VIEW | Permissions.CONTEST_VIEW_STANDINGS |
+                   Permissions.USER_VIEW)
 
     @staticmethod
     def is_permitted(permission):
@@ -37,6 +38,7 @@ class UserRole(Role):
     id = 2
     permissions = (ObserverRole.permissions | Permissions.PROBLEM_SUBMIT | Permissions.PROBLEM_VIEW_SUBMISSIONS |
                    Permissions.SUBMISSIONS_VIEW | Permissions.SUBMISSION_VIEW | Permissions.CONTEST_JOIN |
+                   Permissions.USER_LOAD_USERPIC | Permissions.USER_DELETE_USERPIC |
                    Permissions.NEWS_RATE | Permissions.NEWS_UNRATE | Permissions.FEEDBACK_LEAVE)
     display_name = "Пользователь"
     color = "#000000"
@@ -63,10 +65,11 @@ class TeacherRole(Role):
     id = 4
     permissions = (GroupLeaderRole.permissions | Permissions.PROBLEM_CREATE | Permissions.PROBLEM_EDIT |
                    Permissions.PROBLEM_DELETE | Permissions.PROBLEM_VIEW_TESTS | Permissions.PROBLEM_CREATE_TEST |
-                   Permissions.PROBLEM_EDIT_TEST | Permissions.PROBLEM_DELETE_TEST | Permissions.SUBMISSIONS_VIEW_ALL |
+                   Permissions.PROBLEM_EDIT_TEST | Permissions.PROBLEM_REMOVE_TEST | Permissions.SUBMISSIONS_VIEW_ALL |
                    Permissions.CONTEST_CREATE | Permissions.CONTEST_EDIT | Permissions.CONTEST_DELETE |
                    Permissions.CONTEST_ADD_PROBLEM | Permissions.CONTEST_REMOVE_PROBLEM |
-                   Permissions.CONTEST_DOWNLOAD_STANDINGS | Permissions.GROUPS_VIEW | Permissions.GROUP_CREATE |
+                   Permissions.CONTEST_DOWNLOAD_STANDINGS | Permissions.USERS_VIEW |
+                   Permissions.GROUPS_VIEW | Permissions.GROUP_CREATE |
                    Permissions.GROUP_EDIT | Permissions.GROUP_DELETE)
     display_name = "Преподаватель"
     color = "0000C2"
@@ -79,9 +82,9 @@ class TeacherRole(Role):
 class AdminRole(Role):
     id = 5
     permissions = (TeacherRole.permissions | Permissions.NEWS_CREATE | Permissions.NEWS_EDIT | Permissions.NEWS_DELETE |
-                   Permissions.ASSIGN_ROLES)
+                   Permissions.ASSIGN_ROLES | Permissions.USER_DELETE)
     display_name = "Администратор"
-    color = "#660099"
+    color = "#7E00CC"
 
     @staticmethod
     def is_permitted(permission):

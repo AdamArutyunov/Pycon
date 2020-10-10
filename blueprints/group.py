@@ -1,18 +1,19 @@
-from Pycon import admin_required
+from Pycon import permission_required
 from flask import Blueprint, render_template, abort, redirect
-from flask_login import login_required
+from flask_login import current_user
 from data import db_session
 from data.models.group import Group
 from data.models.user import User
 from forms.create_group import *
 from forms.group_add_user import *
+from lib.Permissions import *
+from lib.Roles import *
 
 blueprint = Blueprint('group', __name__, template_folder='/templates/group')
 
 
 @blueprint.route('/')
-@login_required
-@admin_required
+@permission_required(Permissions.GROUPS_VIEW)
 def groups():
     session = db_session.create_session()
     groups = session.query(Group).order_by(Group.id).all()
@@ -21,8 +22,7 @@ def groups():
 
 
 @blueprint.route('/<int:group_id>')
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_VIEW)
 def group(group_id):
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
@@ -30,12 +30,14 @@ def group(group_id):
     if not group:
         abort(404)
 
+    if not (current_user.group == group or current_user.get_role() == AdminRole):
+        abort(403)
+
     return render_template('group/group.html', title=group.name, group=group)
 
 
 @blueprint.route('/create', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_CREATE)
 def create_group():
     session = db_session.create_session()
     form = CreateGroupForm()
@@ -54,8 +56,7 @@ def create_group():
 
 
 @blueprint.route('/<int:group_id>/edit', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_EDIT)
 def edit_group(group_id):
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
@@ -77,8 +78,7 @@ def edit_group(group_id):
 
 
 @blueprint.route('/<int:group_id>/delete')
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_DELETE)
 def delete_group(group_id):
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
@@ -93,13 +93,15 @@ def delete_group(group_id):
 
 
 @blueprint.route('/<int:group_id>/add_user', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_ADD_USER)
 def group_add_user(group_id):
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
     if not group:
         abort(404)
+
+    if not (current_user.group == group or current_user.get_role() == AdminRole):
+        abort(403)
 
     form = GroupAddUserForm()
     if form.validate_on_submit():
@@ -121,8 +123,7 @@ def group_add_user(group_id):
 
 
 @blueprint.route('/<int:group_id>/remove_user/<int:user_id>')
-@login_required
-@admin_required
+@permission_required(Permissions.GROUP_REMOVE_USER)
 def group_remove_user(group_id, user_id):
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
@@ -130,6 +131,9 @@ def group_remove_user(group_id, user_id):
 
     if not group or not user:
         abort(404)
+
+    if not (current_user.group == group or current_user.get_role() == AdminRole):
+        abort(403)
 
     group.remove_user(user)
 
