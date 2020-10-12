@@ -19,8 +19,7 @@ blueprint = Blueprint('problem', __name__, template_folder='/templates/problem')
 def problems():
     session = db_session.create_session()
     problems = session.query(Problem).order_by(Problem.id.desc()).all()
-    return render_template('problem/problems.html', title="Задачи",
-                           problems=problems)
+    return render_template('problem/problems.html', title="Задачи", problems=problems)
 
 
 @blueprint.route('/<int:problem_id>', methods=["GET", "POST"])
@@ -131,7 +130,7 @@ def problem_submissions(problem_id):
                                                                  (Problem.id == problem_id))\
                   .order_by(Submission.id.desc()).all()
     return render_template('submission/submissions.html', title=f"Посылки задачи №{problem_id}",
-                           submissions=submissions, VERDICTS=VERDICTS)
+                           submissions=submissions)
 
 
 @blueprint.route('/<int:problem_id>/tests')
@@ -143,7 +142,7 @@ def problem_tests(problem_id):
         abort(404)
 
     return render_template('problem/problem_tests.html', title=f"Тесты задачи №{problem_id}",
-                           problem=problem)
+                           problem=problem, Permissions=Permissions)
 
 
 @blueprint.route('/<int:problem_id>/tests/create', methods=["GET", "POST"])

@@ -37,7 +37,7 @@
             <th class="solutions-td">
               {{ group.users|length }}
             </th>
-            {% if current_user.is_authenticated and current_user.is_admin() %}
+            {% if current_user.is_permitted(Permissions.GROUP_DELETE) %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/groups/{{ group.id }}/delete">
                   ×
@@ -49,7 +49,7 @@
       </table>
     {% endif %}
   </div>
-  {% if current_user.is_authenticated and current_user.is_admin() %}
+  {% if current_user.is_permitted(Permissions.GROUP_CREATE) %}
     <div class="normal-block" id="admin-features">
       <a href="/groups/create" class="list alert-admin">
         Создать группу

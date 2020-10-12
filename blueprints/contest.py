@@ -19,8 +19,7 @@ def contests():
     session = db_session.create_session()
     contests = session.query(Contest).order_by(Contest.id.desc()).all()
 
-    return render_template('contest/contests.html', title="Контесты",
-                           contests=contests)
+    return render_template('contest/contests.html', title="Контесты", contests=contests)
 
 
 @blueprint.route('/<int:contest_id>')
@@ -31,8 +30,7 @@ def contest(contest_id):
     if not contest:
         abort(404)
 
-    return render_template('contest/contest.html', title=f'Контест №{contest_id}',
-                           contest=contest)
+    return render_template('contest/contest.html', title=f'Контест №{contest_id}', contest=contest)
 
 
 @blueprint.route('/create', methods=["GET", "POST"])

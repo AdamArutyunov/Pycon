@@ -37,65 +37,30 @@
       </div>
     </a>
     <div id="header-links">
-      <script>
-        let path = document.location.pathname;
-        let dct = {
-        'links': {
-          '/': "Главная",
-          '/problems/': "Задачи",
-          '/contests/': "Контесты",
-          '/submissions/': "Мои посылки"
-        },
+        {% set path = request.path %}
+        {% set links = {'/': ["Главная", Permissions.INDEX_VIEW],
+          '/problems/': ["Задачи", Permissions.PROBLEMS_VIEW],
+          '/contests/': ["Контесты", Permissions.CONTESTS_VIEW],
+          '/submissions/': ["Мои посылки", Permissions.SUBMISSIONS_VIEW],
+          '/users/': ["Пользователи", Permissions.USERS_VIEW],
+          '/groups/': ["Группы", Permissions.GROUPS_VIEW],
+          '/submissions/all': ["Все посылки", Permissions.SUBMISSIONS_VIEW_ALL]}
+        %}
 
-        'admin_links':
-          {
-            '/users/': "Пользователи",
-            '/groups/': "Группы",
-            '/submissions/all': "Все посылки"
-          }
-        }
-
-        for (var key in dct['links']) {
-          document.write("<div class='link-wrapper'>")
-          let value = dct['links'][key]
-
-          if (path == key) {
-            document.write(value);
-          } else {
-            document.write(`<a href='${key}'>${value}</a>`);
-          }
-
-          document.write("</div>")
-        }
-
-        document.write('<br>')
-
-        {% if current_user.is_authenticated and current_user.is_admin() %}
-          for (var key in dct['admin_links']) {
-            document.write("<div class='link-wrapper'>")
-            let value = dct['admin_links'][key];
-
-            if (path == key) {
-              document.write(value);
-            } else {
-              document.write(`<a href='${key}' class='alert-admin'>${value}</a>`);
-            }
-            document.write("</div>")
-          }
-        {% endif %}
-
-      </script>
+        {% for key, value in links.items() %}
+            {% if current_user.is_permitted(value[1]) %}
+                <div class='link-wrapper'>
+                {% if path != key %} <a href='{{ key }}'>{{ value[0] }}</a> {% else %} {{ value[0] }} {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
     <div id="login-block">
       {% if current_user.is_authenticated %}
         Вы вошли как <a href="/users/{{ current_user.id }}"><b>{{ current_user.login }}</b></a><br>
-        <script>
-          document.write(`<a href="/logout?next=${path}">Выйти</a><br>`)
-        </script>
+          <a href="/logout?next={{ path }}">Выйти</a><br>
       {% else %}
-        <script>
-          document.write(`<a href="/login?next=${path}">Войти</a><br>`)
-        </script>
+          <a href="/login?next={{ path }}">Войти</a><br>
         <a href="/register">Зарегистрироваться</a>
       {% endif %}
     </div>

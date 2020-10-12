@@ -8,6 +8,7 @@ from forms.create_group import *
 from forms.group_add_user import *
 from lib.Permissions import *
 from lib.Roles import *
+from lib import Roles
 
 blueprint = Blueprint('group', __name__, template_folder='/templates/group')
 
@@ -17,8 +18,7 @@ blueprint = Blueprint('group', __name__, template_folder='/templates/group')
 def groups():
     session = db_session.create_session()
     groups = session.query(Group).order_by(Group.id).all()
-    return render_template('group/groups.html', title="Группы",
-                           groups=groups)
+    return render_template('group/groups.html', title="Группы", groups=groups)
 
 
 @blueprint.route('/<int:group_id>')

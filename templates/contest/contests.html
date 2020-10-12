@@ -53,7 +53,7 @@
             <td class="id-td">
               {{ contest.participants|length }}
             </td>
-            {% if current_user.is_authenticated and current_user.is_admin() %}
+            {% if current_user.is_permitted(Permissions.CONTEST_DELETE) %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/delete">
                   ×
@@ -65,7 +65,7 @@
       </table>
     {% endif %}
   </div>
-  {% if current_user.is_authenticated and current_user.is_admin() %}
+  {% if current_user.is_permitted(Permissions.CONTEST_CREATE) %}
     <div class="normal-block" id="admin-features">
       <a href="/contests/create" class="list alert-admin">
         Создать контест

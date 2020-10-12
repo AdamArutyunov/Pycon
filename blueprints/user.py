@@ -5,10 +5,12 @@ from flask_login import current_user
 from data import db_session
 from data.models.user import User
 from forms.upload_userpic import *
+from forms.assign_role import *
 from werkzeug.utils import secure_filename
 from Constants import *
 from lib.Permissions import *
 from lib.Roles import *
+from lib import Roles
 
 blueprint = Blueprint('user', __name__, template_folder='/templates/users')
 
@@ -20,8 +22,7 @@ def users():
 
     users = session.query(User).all()
 
-    return render_template('user/users.html', title="Пользователи",
-                           users=users)
+    return render_template('user/users.html', title="Пользователи", users=users)
 
 
 @blueprint.route('/<int:user_id>', methods=["GET", "POST"])
@@ -33,12 +34,9 @@ def user(user_id):
     if not user:
         abort(404)
 
-    if not (user == current_user or current_user.get_role() == AdminRole):
-        abort(403)
-
-    form = UploadUserpicForm()
-    if form.validate_on_submit() and current_user == user:
-        file = form.image.data
+    userpic_form = UploadUserpicForm()
+    if userpic_form.validate_on_submit() and (user == current_user or current_user.get_role() == AdminRole):
+        file = userpic_form.image.data
         filename = secure_filename(file.filename)
 
         old_path = user.userpic_uri
@@ -52,15 +50,20 @@ def user(user_id):
         short_folder = "/static/img/userpics"
         short_path = os.path.join(short_folder, filename)
 
-
         path = APP_ROOT + short_path
         file.save(path)
 
         user.userpic_uri = short_path
         session.commit()
 
+    assign_role_form = AssignRoleForm()
+    if assign_role_form.validate_on_submit() and current_user.is_permitted(Permissions.ASSIGN_ROLES):
+        user.role = assign_role_form.role.data
+
+        session.commit()
+
     return render_template('user/user.html', title=f"Профиль {user.login}",
-                           user=user, form=form)
+                           user=user, assign_role_form=assign_role_form, userpic_form=userpic_form)
 
 
 @blueprint.route('/<int:user_id>/delete')
@@ -79,7 +82,7 @@ def delete_user(user_id):
 
 
 @blueprint.route('/<int:user_id>/delete_userpic', methods=["GET", "POST"])
-@permission_required(Permissions.USER_DELETE_USERPIC)
+@permission_required(Permissions.USER_LOAD_USERPIC)
 def user_delete_userpic(user_id):
     session = db_session.create_session()
 

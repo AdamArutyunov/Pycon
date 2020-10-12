@@ -56,23 +56,18 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
-    def is_admin(self):
-        if self.role == 1 or self.login == "Adam":
-            return True
-        return False
-
     @property
     def solved_problems(self):
         session = db_session.create_session()
         problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
-                                                                    (UserToProblem.solved == True)).all()
+                                                                   (UserToProblem.solved == True)).all()
         return problem_associations
 
     @property
     def unsolved_problems(self):
         session = db_session.create_session()
         problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
-                                                                    (UserToProblem.solved == False)).all()
+                                                                   (UserToProblem.solved == False)).all()
         return problem_associations
 
     def solve_problem(self, problem):
@@ -80,6 +75,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         if not problem_association:
             problem_association = UserToProblem()
             problem_association.problem = problem
+            problem_association.user = self
             problem_association.solved = True
             self.problems.append(problem_association)
         else:
@@ -93,6 +89,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         if not problem_association:
             problem_association = UserToProblem()
             problem_association.problem = problem
+            problem_association.user = self
             problem_association.solved = False
             self.problems.append(problem_association)
         else:
@@ -137,6 +134,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         
         contest_association = UserToContest()
         contest_association.contest = contest
+        contest_association.user = self
         self.contests.append(contest_association)
 
     def rate_news(self, news, rate):
@@ -190,4 +188,68 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def is_permitted(self, permission):
         return self.get_role().is_permitted(permission)
+
+
+class PyconAnonymousUser:
+    @property
+    def is_active(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return False
+
+    @property
+    def is_anonymous(self):
+        return True
+
+    def get_id(self):
+        return None
+
+    @property
+    def solved_problems(self):
+        return []
+
+    @property
+    def unsolved_problems(self):
+        return []
+
+    def solve_problem(self, problem):
+        return
+
+    def unsolve_problem(self, problem):
+        return
+
+    def is_problem_solved(self, problem):
+        return False
+
+    def get_problem_association(self, problem):
+        return
+
+    def get_contest_association(self, contest):
+        return
+
+    def get_solved_contest_problems_count(self, contest):
+        return 0
+
+    def join_contest(self, contest):
+        return
+
+    def rate_news(self, news, rate):
+        return
+
+    def unrate_news(self, news):
+        return
+
+    def get_news_rate(self, news):
+        return None
+
+    def get_role(self):
+        return ObserverRole
+
+    def is_permitted(self, permission):
+        return self.get_role().is_permitted(permission)
+
+
+
 

@@ -112,7 +112,7 @@ a.alert-warning:hover {
 }
 
 a.alert-admin {
-  border-color: #660099;
+  border-color: #9D00FF;
 }
 
 a.alert-admin:hover {
@@ -350,7 +350,7 @@ table a {
 }
 
 .alert-admin {
-  color: #660099;
+  color: #9D00FF;
 }
 
 .big-fucking-span {
@@ -568,6 +568,7 @@ table a {
 }
 
 #header-links {
+  max-width: 500px;
   display: inline-block;
   margin-left: 130px;
   margin-top: 50px;

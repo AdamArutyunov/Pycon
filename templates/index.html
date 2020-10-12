@@ -10,7 +10,7 @@
   Сейчас платформа находится в стадии тестирования. Проблемы, вопросы, предложения — <a href="/feedback">сюда</a>.
   <br><br>
 
-  {% if current_user.is_authenticated and current_user.is_admin() %}
+  {% if current_user.is_permitted(Permissions.NEWS_CREATE) %}
     <a href="/news/create" class="alert-admin">Создать новость</a>
   {% endif %}
 
@@ -32,7 +32,7 @@
           <div style="height: 20px;"></div>
 
           <div class="news-rating">
-          {% if current_user.is_authenticated %}
+          {% if current_user.is_permitted(Permissions.NEWS_RATE) %}
             {% set user_rating = current_user.get_news_rate(new) %}
             {% if user_rating == None %}
               <a class="rating-button rate-up-button" id="rate-up-{{ new.id }}" onclick="rate_news({{ new.id }}, 1)">▲</a>
@@ -54,11 +54,14 @@
           {% endif %}
           </div>
 
-          {% if current_user.is_authenticated and current_user.is_admin() %}
+          {% if current_user.is_permitted(Permissions.NEWS_EDIT) or current_user.is_permitted(Permissions.NEWS_DELETE) %}
             <br>
+          {% endif %}
+          {% if current_user.is_permitted(Permissions.NEWS_EDIT) %}
             <a href="/news/{{ new.id }}/edit" class="alert-admin">Редактировать</a>
-            &nbsp;&nbsp;&nbsp;
-            <a href="/news/{{ new.id }}/delete" class="alert-admin">Удалить</a>
+          {% endif %}
+          {% if current_user.is_permitted(Permissions.NEWS_DELETE) %}
+            &nbsp;&nbsp;&nbsp;<a href="/news/{{ new.id }}/delete" class="alert-admin">Удалить</a>
           {% endif %}
         </div>
       {% endfor %}

@@ -17,7 +17,7 @@ def submissions():
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
                   .order_by(Submission.id.desc()).all()
     return render_template('submission/submissions.html', title="Посылки",
-                           submissions=submissions, VERDICTS=VERDICTS)
+                           submissions=submissions)
 
 
 @blueprint.route('/all')
@@ -27,7 +27,7 @@ def submissions_all():
     submissions = session.query(Submission).order_by(Submission.id.desc()).all()
     
     return render_template('submission/submissions.html', title="Все посылки",
-                           submissions=submissions, VERDICTS=VERDICTS)
+                           submissions=submissions)
 
 
 @blueprint.route('/<int:submission_id>')
@@ -43,4 +43,4 @@ def submission(submission_id):
         abort(403)
 
     return render_template('submission/submission.html', title=f"Посылка №{submission.id}",
-                           submission=submission, LANGUAGES=LANGUAGES, VERDICTS=VERDICTS)
+                           submission=submission)

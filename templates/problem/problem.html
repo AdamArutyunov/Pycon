@@ -59,7 +59,7 @@
     <h3>
       Сдать
     </h3>
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_permitted(Permissions.PROBLEM_SUBMIT) %}
       <div class="big-block">
         <form method="post" name="text-solution-send" enctype="multipart/form-data" action="">
           {{ submit_form.hidden_tag() }}
@@ -95,21 +95,25 @@
     {% else %}
         Чтобы сдать задачу, нужно <a href="/login?next=/problems/{{ problem.id }}#send">войти в систему</a> или <a href="/register?next=/problems/{{ problem.id }}#send">зарегистрироваться</a>.
     {% endif %}
-    {% if current_user.is_authenticated and current_user.is_admin() %}
-      <div class="normal-block" id="admin-features">
+    <div class="normal-block" id="admin-features">
+    {% if current_user.is_permitted(Permissions.PROBLEM_VIEW_TESTS) %}
         <a href="/problems/{{problem.id}}/tests" class="list alert-admin">
           Посмотреть тесты
         </a>
         <br>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.PROBLEM_EDIT) %}
         <a href="/problems/{{problem.id}}/edit" class="list alert-admin">
           Редактировать задачу
         </a>
         <br>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.PROBLEM_DELETE) %}
         <a href="/problems/{{ problem.id }}/delete" class="alert-danger list">
           Удалить задачу
         </a>
-      </div>
     {% endif %}
+    </div>
   </div>
 
   <script type="text/javascript">

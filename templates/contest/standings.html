@@ -77,7 +77,7 @@
           </tr>
         {% endfor %}
       </table>
-      {% if current_user.is_authenticated and current_user.is_admin() %}
+      {% if current_user.is_permitted(Permissions.CONTEST_DOWNLOAD_STANDINGS) %}
         <div class="content-block">
           <a href="/contests/{{ contest.id }}/standings/csv" class="alert-admin">
             Скачать CSV

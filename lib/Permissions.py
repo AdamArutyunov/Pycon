@@ -39,7 +39,6 @@ class Permissions:
     USER_VIEW = 1 * 0x10 ** 11
     USER_DELETE = 2 * 0x10 ** 11
     USER_LOAD_USERPIC = 4 * 0x10 ** 11
-    USER_DELETE_USERPIC = 8 * 0x10 ** 11
 
     GROUPS_VIEW = 1 * 0x10 ** 12
 
@@ -56,7 +55,6 @@ class Permissions:
     NEWS_DELETE = 4 * 0x10 ** 15
 
     NEWS_RATE = 1 * 0x10 ** 16
-    NEWS_UNRATE = 2 * 0x10 ** 16
 
     FEEDBACK_LEAVE = 1 * 0x10 ** 17
 

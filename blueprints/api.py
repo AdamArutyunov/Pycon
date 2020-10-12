@@ -27,7 +27,7 @@ def rate_news():
 
 
 @blueprint.route('/unrate_news', methods=["POST"])
-@permission_required(Permissions.NEWS_UNRATE)
+@permission_required(Permissions.NEWS_RATE)
 def unrate_news():
     news_id = request.json.get("news_id")
 
