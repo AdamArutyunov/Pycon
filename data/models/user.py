@@ -221,7 +221,7 @@ class PyconAnonymousUser:
         return
 
     def is_problem_solved(self, problem):
-        return False
+        return
 
     def get_problem_association(self, problem):
         return

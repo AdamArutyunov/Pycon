@@ -1,5 +1,5 @@
 import os
-from flask import Flask, abort, redirect
+from flask import Flask, abort, redirect, request
 from flask_login import LoginManager, current_user
 from multiprocessing import Process
 from functools import wraps
@@ -39,7 +39,7 @@ def permission_required(permission):
             if current_user.is_permitted(permission):
                 return func(*args, **kwargs)
             if not current_user.is_authenticated:
-                return redirect("/login")
+                return redirect(f"/login?next={request.path}")
             abort(403)
         return new_func
     return inner_decorator
