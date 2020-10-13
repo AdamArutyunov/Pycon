@@ -29,9 +29,9 @@
         {% for problem in problems %}
           <tr>
             <td class="id-td">
-              {% if current_user.is_authenticated and current_user.is_problem_solved(problem) == True %}
+              {% if current_user.is_problem_solved(problem) == True %}
                 <div class="problem-status solved-problem-div">
-              {% elif current_user.is_authenticated and current_user.is_problem_solved(problem) == False %}
+              {% elif current_user.is_problem_solved(problem) == False %}
                 <div class="problem-status unsolved-problem-div">
               {% endif %}
               </div>
@@ -43,7 +43,7 @@
             <td class="solutions-td">
               {{ problem.users_solved|length }}
             </td>
-            {% if current_user.is_authenticated and current_user.is_admin() %}
+            {% if current_user.is_permitted(Permissions.PROBLEM_DELETE) %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/problems/{{ problem.id }}/delete">
                   ×
@@ -55,7 +55,7 @@
       </table>
     {% endif %}
   </div>
-  {% if current_user.is_authenticated and current_user.is_admin() %}
+  {% if current_user.is_permitted(Permissions.PROBLEM_CREATE) %}
     <div class="normal-block" id="admin-features">
       <a href="/problems/create" class="list alert-admin">
         Создать задачу

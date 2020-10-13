@@ -4,7 +4,8 @@
   <div class="content-header" id="contest-header">
     <h1>
       {{ contest.name }}
-      {% if current_user.is_authenticated and not current_user.get_contest_association(contest) and not contest.is_finished() %}
+      {% if current_user.is_permitted(Permissions.CONTEST_JOIN) and
+         not current_user.get_contest_association(contest) and not contest.is_finished() %}
         <a href="/contests/{{ contest.id }}/join" class="plus-button">
           <div>
             +
@@ -16,7 +17,8 @@
       <!-- Estimated time -->
     </h3>
   </div>
-  {% if not contest.hidden or contest.is_started() or (current_user.is_authenticated and current_user.is_admin()) %}
+  {% if (not contest.hidden or contest.is_started() and current_user.is_permitted(Permissions.CONTEST_VIEW_STANDINGS))
+         or (current_user.get_role() == Roles.AdminRole) %}
     <div class="normal-block">
       <h3>
         <a href="/contests/{{ contest.id }}/standings">
@@ -43,7 +45,7 @@
           {% for problem in contest.problems %}
             <tr>
                 <td class="id-td">
-                {% if current_user.is_authenticated and current_user.get_contest_association(contest) %}
+                {% if current_user.get_contest_association(contest) %}
                   {% if current_user.is_problem_solved(problem) == True %}
                     <div class="problem-status solved-problem-div">
                   {% elif current_user.is_problem_solved(problem) == False %}
@@ -56,7 +58,7 @@
               <td class="problemname-td">
                 <a href="/problems/{{ problem.id }}">{{ problem.name }}</a>
               </td>
-              {% if current_user.is_authenticated and current_user.is_admin() %}
+              {% if current_user.is_permitted(Permissions.CONTEST_REMOVE_PROBLEM) %}
                 <td class="id-td">
                   <a class="alert-danger delete-button" href="/contests/{{ contest.id }}/remove_problem/{{ problem.id }}">
                     ×
@@ -73,21 +75,25 @@
       Задачи и положение участников будут доступны после начала контеста.
     </h3>
   {% endif %}
-  {% if current_user.is_authenticated and current_user.is_admin() %}
-    <div class="normal-block" id="admin-features">
+  <div class="normal-block" id="admin-features">
+    {% if current_user.is_permitted(Permissions.CONTEST_ADD_PROBLEM) %}
       <a href="/contests/{{ contest.id }}/add_problem" class="list alert-admin">
         Добавить задачу
       </a>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.CONTEST_EDIT) %}
       <br>
       <a href="/contests/{{ contest.id }}/edit" class="list alert-admin">
         Редактировать контест
       </a>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.CONTEST_DELETE) %}
       <br>
       <a href="/contests/{{ contest.id }}/delete" class="alert-danger list">
         Удалить контест
       </a>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
   <script>
   let contest_start = new Date("{{ contest.start_date }}Z");
   let contest_end = new Date("{{ contest.start_date + contest.duration }}Z");

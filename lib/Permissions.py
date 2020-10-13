@@ -1,0 +1,63 @@
+class Permissions:
+    INDEX_VIEW = 1 * 0x10 ** 0
+
+    PROBLEMS_VIEW = 1 * 0x10 ** 1
+
+    PROBLEM_VIEW = 1 * 0x10 ** 2
+    PROBLEM_CREATE = 2 * 0x10 ** 2
+    PROBLEM_EDIT = 4 * 0x10 ** 2
+    PROBLEM_DELETE = 8 * 0x10 ** 2
+
+    PROBLEM_SUBMIT = 1 * 0x10 ** 3
+    PROBLEM_VIEW_SUBMISSIONS = 2 * 0x10 ** 3
+
+    PROBLEM_VIEW_TESTS = 1 * 0x10 ** 4
+    PROBLEM_CREATE_TEST = 2 * 0x10 ** 4
+    PROBLEM_EDIT_TEST = 4 * 0x10 ** 4
+    PROBLEM_REMOVE_TEST = 8 * 0x10 ** 4
+
+    SUBMISSIONS_VIEW = 1 * 0x10 ** 5
+    SUBMISSIONS_VIEW_ALL = 2 * 0x10 ** 5
+    SUBMISSION_VIEW = 4 * 0x10 ** 5
+
+    CONTESTS_VIEW = 1 * 0x10 ** 6
+
+    CONTEST_VIEW = 1 * 0x10 ** 7
+    CONTEST_CREATE = 2 * 0x10 ** 7
+    CONTEST_EDIT = 4 * 0x10 ** 7
+    CONTEST_DELETE = 8 * 0x10 ** 7
+
+    CONTEST_ADD_PROBLEM = 1 * 0x10 ** 8
+    CONTEST_REMOVE_PROBLEM = 2 * 0x10 ** 8
+
+    CONTEST_JOIN = 1 * 0x10 ** 9
+    CONTEST_VIEW_STANDINGS = 2 * 0x10 ** 9
+    CONTEST_DOWNLOAD_STANDINGS = 4 * 0x10 ** 9
+
+    USERS_VIEW = 1 * 0x10 ** 10
+
+    USER_VIEW = 1 * 0x10 ** 11
+    USER_DELETE = 2 * 0x10 ** 11
+    USER_LOAD_USERPIC = 4 * 0x10 ** 11
+
+    GROUPS_VIEW = 1 * 0x10 ** 12
+
+    GROUP_VIEW = 1 * 0x10 ** 13
+    GROUP_CREATE = 2 * 0x10 ** 13
+    GROUP_EDIT = 4 * 0x10 ** 13
+    GROUP_DELETE = 8 * 0x10 ** 13
+
+    GROUP_ADD_USER = 1 * 0x10 ** 14
+    GROUP_REMOVE_USER = 2 * 0x10 ** 14
+
+    NEWS_CREATE = 1 * 0x10 ** 15
+    NEWS_EDIT = 2 * 0x10 ** 15
+    NEWS_DELETE = 4 * 0x10 ** 15
+
+    NEWS_RATE = 1 * 0x10 ** 16
+
+    FEEDBACK_LEAVE = 1 * 0x10 ** 17
+
+    ASSIGN_ROLES = 1 * 0x10 ** 18
+
+

@@ -1,40 +1,40 @@
 import datetime
 import csv
-from Pycon import admin_required
+from Pycon import permission_required
 from flask import Blueprint, render_template, abort, redirect, send_file
-from flask_login import login_required, current_user
+from flask_login import current_user
 from data import db_session
 from data.models.problem import Problem
 from data.models.contest import Contest
 from forms.create_contest import *
 from forms.contest_add_problem import *
+from lib.Permissions import *
 
 blueprint = Blueprint('contest', __name__, template_folder='/templates/contest')
 
 
 @blueprint.route('/')
+@permission_required(Permissions.CONTESTS_VIEW)
 def contests():
     session = db_session.create_session()
     contests = session.query(Contest).order_by(Contest.id.desc()).all()
 
-    return render_template('contest/contests.html', title="Контесты",
-                           contests=contests)
+    return render_template('contest/contests.html', title="Контесты", contests=contests)
 
 
 @blueprint.route('/<int:contest_id>')
+@permission_required(Permissions.CONTEST_VIEW)
 def contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
     if not contest:
         abort(404)
 
-    return render_template('contest/contest.html', title=f'Контест №{contest_id}',
-                           contest=contest)
+    return render_template('contest/contest.html', title=f'Контест №{contest_id}', contest=contest)
 
 
 @blueprint.route('/create', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_CREATE)
 def create_contest():
     session = db_session.create_session()
     form = CreateContestForm()
@@ -56,8 +56,7 @@ def create_contest():
 
 
 @blueprint.route('/<int:contest_id>/edit', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_EDIT)
 def edit_contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -85,8 +84,7 @@ def edit_contest(contest_id):
 
 
 @blueprint.route('/<int:contest_id>/delete')
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_DELETE)
 def delete_contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -101,8 +99,7 @@ def delete_contest(contest_id):
 
 
 @blueprint.route('/<int:contest_id>/add_problem', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_ADD_PROBLEM)
 def contest_add_problem(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -129,8 +126,7 @@ def contest_add_problem(contest_id):
 
 
 @blueprint.route('/<int:contest_id>/remove_problem/<int:problem_id>')
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_REMOVE_PROBLEM)
 def contest_remove_problem(contest_id, problem_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -147,7 +143,7 @@ def contest_remove_problem(contest_id, problem_id):
 
 
 @blueprint.route('/<int:contest_id>/join')
-@login_required
+@permission_required(Permissions.CONTEST_JOIN)
 def join_contest(contest_id):
     session = db_session.create_session()
     contest = session.query(Contest).get(contest_id)
@@ -161,6 +157,7 @@ def join_contest(contest_id):
 
 
 @blueprint.route('/<int:contest_id>/standings')
+@permission_required(Permissions.CONTEST_VIEW_STANDINGS)
 def contest_standings(contest_id):
     session = db_session.create_session()
 
@@ -176,8 +173,7 @@ def contest_standings(contest_id):
 
 
 @blueprint.route('/<int:contest_id>/standings/csv')
-@login_required
-@admin_required
+@permission_required(Permissions.CONTEST_DOWNLOAD_STANDINGS)
 def contest_standings_csv(contest_id):
     session = db_session.create_session()
 

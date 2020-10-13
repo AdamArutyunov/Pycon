@@ -2,7 +2,7 @@ from Constants import *
 
 
 class Language:
-    id = -1
+    id = 0
     display_name = "Abstract Language"
 
 

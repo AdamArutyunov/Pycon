@@ -568,6 +568,7 @@ table a {
 }
 
 #header-links {
+  max-width: 500px;
   display: inline-block;
   margin-left: 130px;
   margin-top: 50px;

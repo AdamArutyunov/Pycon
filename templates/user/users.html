@@ -24,12 +24,15 @@
         {% for user in users %}
           <tr>
             <td class="id-td">
+              {% if user.get_role() != Roles.UserRole %}
+                <div class="problem-status" style="background-color: {{ user.get_role().color }}"></div>
+              {% endif %}
               {{ user.id }}
             </td>
             <td class="problemname-td">
               <a href="/users/{{ user.id }}">{{ user.login }}</a>
             </td>
-            {% if current_user.is_authenticated and current_user.is_admin() %}
+            {% if current_user.is_permitted(Permissions.USER_DELETE) %}
               <td class="id-td">
                 <a class="alert-danger delete-button" href="/users/{{ user.id }}/delete">
                   ×

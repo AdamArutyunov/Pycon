@@ -46,5 +46,5 @@ class MemoryLimitVerdict(Verdict):
         super().__init__(7, True, "ML", "Превышение лимита памяти", *args, **kwargs)
 
 
-VERDICTS = [None, TestingVerdict, OKVerdict, CompilationErrorVerdict, RuntimeErrorVerdict,
+VERDICTS = [Verdict, TestingVerdict, OKVerdict, CompilationErrorVerdict, RuntimeErrorVerdict,
             WrongAnswerVerdict, TimeLimitVerdict, MemoryLimitVerdict]

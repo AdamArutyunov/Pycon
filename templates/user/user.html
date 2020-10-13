@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h3 {% if user.is_admin() %}class="alert-admin"{% endif %}>
-    {% if user.is_admin() %}Администратор{% else %}Пользователь{% endif %}
+  <h3 style="color: {{ user.get_role().color }}">
+    {{ user.get_role().display_name }}
   </h3>
-  <h1 {% if user.is_admin() %}class="alert-admin"{% endif %} style="font-size: 80pt">{{ user.login }}</h1>
+  <h1 class="" style="color: {{ user.get_role().color }}; font-size: 80pt">
+    {{ user.login }}
+  </h1>
 
   <img src="{{ user.userpic_uri }}" style="width: 300px; height: 300px; margin: 20px 0;"
        onerror="this.parentElement.removeChild(this);">
@@ -13,7 +15,8 @@
     <h4>#{{ user.id }}</h4>
     Группа:
     {% if user.group %}
-      {% if current_user.is_authenticated and current_user.is_admin() %}
+      {% if current_user.is_permitted(Permissions.GROUP_VIEW) and current_user.group == user.group or
+            current_user.get_role() == Roles.AdminRole %}
         <a href="/groups/{{ user.group.id }}">{{ user.group.name }}</a>
       {% else %}
         <b>{{ user.group.name }}</b>
@@ -27,15 +30,16 @@
     <br>
     Задач решено: <b>{{ user.solved_problems|length }}</b>
   </div>
-  <div class="small-block">
-    {% if user == current_user %}
+  {% if (user == current_user and current_user.is_permitted(Permissions.USER_LOAD_USERPIC)) or
+         current_user.get_role() == Roles.AdminRole %}
+    <div class="small-block">
       <form method="post" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        {{ form.csrf_token }}
+        {{ userpic_form.hidden_tag() }}
+        {{ userpic_form.csrf_token }}
 
         <label class="label">
           <span class="primary-button">Загрузить юзерпик</span>
-          {{ form.image(class="nodisp", onchange="this.form.submit()") }}
+          {{ userpic_form.image(class="nodisp", onchange="this.form.submit()") }}
         </label>    
         {% if user.userpic_uri %}
           <a href="/users/{{ user.id }}/delete_userpic">Удалить</a>
@@ -43,12 +47,28 @@
 
         <br><br>
 
-        {% for error in form.image.errors %}
+        {% for error in userpic_form.image.errors %}
           <p class="alert alert-danger" role="alert">
               {{ error }}
           </p>
         {% endfor %}
       </form>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
+  {% if current_user.is_permitted(Permissions.ASSIGN_ROLES) %}
+    <div class="small-block">
+      <form method="post">
+        {{ assign_role_form.hidden_tag() }}
+        {{ assign_role_form.csrf_token }}
+
+        {{ assign_role_form.role() }}<br>
+        {% for error in assign_role_form.role.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+        {{ assign_role_form.submit(class="primary-button") }}
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}

@@ -16,12 +16,16 @@
       {% for test in problem.tests %}
         <h4>
           #{{ loop.index }}
+          {% if current_user.is_permitted(Permissions.PROBLEM_EDIT_TEST) %}
           <a class="alert-admin edit-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/edit">
             ✏
           </a>
+          {% endif %}
+          {% if current_user.is_permitted(Permissions.PROBLEM_REMOVE_TEST) %}
           <a class="alert-danger delete-test-button" href="/problems/{{ problem.id }}/tests/{{ test.id }}/remove">
             ×
           </a>
+          {% endif %}
 
         </h4>
         <div class="example">

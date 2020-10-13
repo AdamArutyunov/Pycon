@@ -1,6 +1,6 @@
-from Pycon import admin_required, PyconSolutionChecker
+from Pycon import permission_required, PyconSolutionChecker
 from flask import Blueprint, render_template, abort, redirect
-from flask_login import login_required, current_user
+from flask_login import current_user
 from data import db_session
 from data.models.problem import Problem
 from data.models.submission import Submission
@@ -8,19 +8,22 @@ from data.models.test import Test
 from forms.submit import *
 from forms.create_problem import *
 from forms.create_test import *
+from lib.Verdicts import *
+from lib.Permissions import *
 
 blueprint = Blueprint('problem', __name__, template_folder='/templates/problem')
 
 
 @blueprint.route('/')
+@permission_required(Permissions.PROBLEMS_VIEW)
 def problems():
     session = db_session.create_session()
     problems = session.query(Problem).order_by(Problem.id.desc()).all()
-    return render_template('problem/problems.html', title="Задачи",
-                           problems=problems)
+    return render_template('problem/problems.html', title="Задачи", problems=problems)
 
 
 @blueprint.route('/<int:problem_id>', methods=["GET", "POST"])
+@permission_required(Permissions.PROBLEM_VIEW)
 def problem(problem_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -49,8 +52,7 @@ def problem(problem_id):
 
 
 @blueprint.route('/create', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_CREATE)
 def create_problem():
     form = CreateProblemForm()
     if form.validate_on_submit():
@@ -74,8 +76,7 @@ def create_problem():
 
 
 @blueprint.route('/<int:problem_id>/edit', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_EDIT)
 def edit_problem(problem_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -108,8 +109,7 @@ def edit_problem(problem_id):
 
 
 @blueprint.route('/<int:problem_id>/delete')
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_DELETE)
 def delete_problem(problem_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -123,7 +123,7 @@ def delete_problem(problem_id):
 
 
 @blueprint.route('/<int:problem_id>/submissions')
-@login_required
+@permission_required(Permissions.PROBLEM_VIEW_SUBMISSIONS)
 def problem_submissions(problem_id):
     session = db_session.create_session()
     submissions = session.query(Submission).join(Problem).filter((Submission.submitter == current_user) &
@@ -134,8 +134,7 @@ def problem_submissions(problem_id):
 
 
 @blueprint.route('/<int:problem_id>/tests')
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_VIEW_TESTS)
 def problem_tests(problem_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -143,12 +142,11 @@ def problem_tests(problem_id):
         abort(404)
 
     return render_template('problem/problem_tests.html', title=f"Тесты задачи №{problem_id}",
-                           problem=problem)
+                           problem=problem, Permissions=Permissions)
 
 
 @blueprint.route('/<int:problem_id>/tests/create', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_CREATE_TEST)
 def problem_create_test(problem_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -172,8 +170,7 @@ def problem_create_test(problem_id):
 
 
 @blueprint.route('/<int:problem_id>/tests/<int:test_id>/edit', methods=["GET", "POST"])
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_EDIT_TEST)
 def problem_edit_test(problem_id, test_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
@@ -204,8 +201,7 @@ def problem_edit_test(problem_id, test_id):
 
 
 @blueprint.route('/<int:problem_id>/tests/<int:test_id>/remove')
-@login_required
-@admin_required
+@permission_required(Permissions.PROBLEM_REMOVE_TEST)
 def problem_remove_test(problem_id, test_id):
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
