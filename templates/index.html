@@ -28,7 +28,7 @@
           </h3>
           <div style="height: 20px;"></div>
 
-          {{ new.body|safe }}
+          {{ new.body|replace('\n', '<br>')|safe }}
           <div style="height: 20px;"></div>
 
           <div class="news-rating">

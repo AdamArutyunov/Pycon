@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% set labour_association = current_user.get_labour_association(labour) %}
+  <div class="content-header" id="labour-header">
+    <h1>
+      {{ labour.name }}
+    </h1>
+    <h3 id="limits">
+      <!-- Estimated time -->
+    </h3>
+
+    {% if current_user.is_permitted(Permissions.LABOUR_PERFORM) and
+          not labour_association and not labour.is_finished() and labour.is_started() %}
+      <span class="normal-grey-label">
+        На выполнение этой работы у вас будет <b>{{ (labour.perfomance_time.total_seconds() // 60)|int }}</b> минут.<br>
+        Учтите, что выполнение работы приостановить или прервать нельзя.
+      </span><br><br>
+      <a href="/labours/{{ labour.id }}/perform" class="primary-button">
+        Начать выполнение
+      </a>
+    {% elif not current_user.is_permitted(Permissions.LABOUR_PERFORM) %}
+      Чтобы написать работу, нужно <a href="/login?next={{ request.path }}">войти в систему</a>
+      или <a href="/register?next={{ request.path }}">зарегистрироваться</a>.
+    {% endif %}
+  </div>
+  {% if current_user.is_permitted(Permissions.LABOUR_VIEW_RESULTS) %}
+    <div class="normal-block">
+      <h3>
+        <a href="/labours/{{ labour.id }}/results">
+          Результаты
+        </a>
+      </h3>
+    </div>
+  {% endif %}
+  {% if labour_association and not labour_association.is_finished() or current_user.get_role() == Roles.AdminRole %}
+    <div class="content-block" id="problems-table">
+      {% if labour.problems %}
+        <table class="contest-problems-table">
+          <tr>
+            <th class="id-td">
+              <span>
+                #
+              </span>
+            </th>
+            <th class="problemname-td">
+              <span>
+                Название
+              </span>
+            </th>
+          </tr>
+          {% for problem in labour.problems %}
+            <tr>
+                <td class="id-td">
+                {% if current_user.get_labour_association(labour) %}
+                  {% if current_user.is_problem_solved(problem) == True %}
+                    <div class="problem-status solved-problem-div">
+                  {% elif current_user.is_problem_solved(problem) == False %}
+                    <div class="problem-status unsolved-problem-div">
+                  {% endif %}
+                  </div>
+                {% endif %}
+                {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
+              </td>
+              <td class="problemname-td">
+                <a href="/problems/{{ problem.id }}">{{ problem.name }}</a>
+              </td>
+              {% if current_user.is_permitted(Permissions.LABOUR_REMOVE_PROBLEM) %}
+                <td class="id-td">
+                  <a class="alert-danger delete-button" href="/labours/{{ labour.id }}/remove_problem/{{ problem.id }}">
+                    ×
+                  </a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  {% endif %}
+  <div class="normal-block" id="admin-features">
+    {% if current_user.is_permitted(Permissions.LABOUR_ADD_PROBLEM) %}
+      <a href="/labours/{{ labour.id }}/add_problem" class="list alert-admin">
+        Добавить задачу
+      </a>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.LABOUR_EDIT) %}
+      <br>
+      <a href="/labours/{{ labour.id }}/edit" class="list alert-admin">
+        Редактировать работу
+      </a>
+    {% endif %}
+    {% if current_user.is_permitted(Permissions.LABOUR_DELETE) %}
+      <br>
+      <a href="/labours/{{ labour.id }}/delete" class="alert-danger list">
+        Удалить работу
+      </a>
+    {% endif %}
+  </div>
+  {% if labour_association %}
+    <script>
+    let labour_start = new Date("{{ labour_association.performance_date }}Z");
+    let labour_end = new Date("{{ labour_association.performance_date + labour.perfomance_time }}Z");
+    let timecheck_function = function() {
+        let now = new Date();
+        now = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+        let end_distance = labour_end - now;
+        let start_distance = labour_start - now;
+
+        let out;
+        if (start_distance > 0) {
+            return
+        }
+        else if (end_distance < 0) {
+          out = 'Выполнение работы завершено.';
+          clearInterval(countdown_function);
+        } else {
+          let hours = Math.floor(end_distance / (1000 * 60 * 60));
+          let minutes = Math.floor((end_distance % (1000 * 60 * 60)) / (1000 * 60));
+          let seconds = Math.floor((end_distance % (1000 * 60)) / 1000);
+          out = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        document.getElementById("limits").innerHTML = out;
+        document.title = out + " — Работа №{{ labour.id }}";
+    }
+    let countdown_function = setInterval(timecheck_function, 1000);
+    timecheck_function();
+    </script>
+    {% endif %}
+{% endblock %}

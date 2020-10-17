@@ -38,7 +38,13 @@ class SolutionChecker:
             for submission in submissions:
                 submission.set_verdict(TestingVerdict())
                 session.commit()
-                self.check_submission(submission)
+
+                try:
+                    self.check_submission(submission)
+                except Exception as e:
+                    submission.set_verdict(TestingErrorVerdict())
+
+                session.commit()
 
     def check_submission(self, submission):
         session = db_session.create_session()

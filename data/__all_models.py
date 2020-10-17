@@ -4,4 +4,5 @@ from .models.submission import *
 from .models.test import *
 from .models.contest import *
 from .models.group import *
+from .models.labour import *
 from .models.news import *

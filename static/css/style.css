@@ -253,6 +253,11 @@ table a {
   padding: 8px 12px;
 }
 
+a.primary-button {
+  color: black;
+  border: none;
+}
+
 .CodeMirror {
   font-size: 10pt;
   height: 500px;

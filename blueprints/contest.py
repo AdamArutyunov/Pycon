@@ -210,5 +210,5 @@ def contest_standings_csv(contest_id):
             writer.writerow(row)
 
     return send_file('temp/standings.csv', as_attachment=True,
-                     attachment_filename=f'{contest.id}_standings.csv',
+                     attachment_filename=f'contest_{contest.id}_standings.csv',
                      cache_timeout=-1)

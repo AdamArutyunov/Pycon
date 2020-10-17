@@ -17,6 +17,18 @@ class UserToContest(SqlAlchemyBase):
     contest = orm.relation('Contest', backref=orm.backref('participants', lazy='joined', cascade='all'))
 
 
+class UserToLabour(SqlAlchemyBase):
+    __tablename__ = 'user_to_labour'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user = orm.relation('User', backref=orm.backref('labours', lazy='joined', cascade='all'))
+    labour_id = Column(Integer, ForeignKey('labours.id'), primary_key=True)
+    labour = orm.relation('Labour', backref=orm.backref('performers', lazy='joined', cascade='all'))
+    performance_date = Column(DateTime, default=datetime.datetime.now, nullable=False)
+
+    def is_finished(self):
+        return self.performance_date + self.labour.perfomance_time <= datetime.datetime.now()
+
+
 class UserToProblem(SqlAlchemyBase):
     __tablename__ = 'user_to_problem'
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
@@ -115,10 +127,26 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
         return contest_association
 
+    def get_labour_association(self, labour):
+        session = db_session.create_session()
+        labour_association = session.query(UserToLabour).get((self.id, labour.id))
+
+        return labour_association
+
     def get_solved_contest_problems_count(self, contest):
         solved_problems_count = 0
         
         for problem in contest.problems:
+            problem_association = self.get_problem_association(problem)
+            if problem_association and problem_association.solved:
+                solved_problems_count += 1
+
+        return solved_problems_count
+
+    def get_solved_labour_problems_count(self, labour):
+        solved_problems_count = 0
+
+        for problem in labour.problems:
             problem_association = self.get_problem_association(problem)
             if problem_association and problem_association.solved:
                 solved_problems_count += 1
@@ -136,6 +164,18 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         contest_association.contest = contest
         contest_association.user = self
         self.contests.append(contest_association)
+
+    def perform_labour(self, labour):
+        session = db_session.create_session()
+        labour_association = session.query(UserToLabour).get((self.id, labour.id))
+
+        if labour_association or labour.is_finished() or not labour.is_started():
+            return
+
+        labour_association = UserToLabour()
+        labour_association.labour = labour
+        labour_association.user = self
+        self.labours.append(labour_association)
 
     def rate_news(self, news, rate):
         session = db_session.create_session()
@@ -229,10 +269,19 @@ class PyconAnonymousUser:
     def get_contest_association(self, contest):
         return
 
+    def get_labour_association(self, labour):
+        return
+
     def get_solved_contest_problems_count(self, contest):
         return 0
 
+    def get_solved_labour_problems_count(self, labour):
+        return 0
+
     def join_contest(self, contest):
+        return
+
+    def perform_labour(self, labour):
         return
 
     def rate_news(self, news, rate):
