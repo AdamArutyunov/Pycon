@@ -53,7 +53,9 @@ class UserRole(Role):
 
 class WizardGirlRole(Role):
     id = 3
-    permissions = UserRole.permissions
+    permissions = (UserRole.permissions | Permissions.PROBLEM_CREATE | Permissions.PROBLEM_EDIT |
+                   Permissions.PROBLEM_DELETE | Permissions.PROBLEM_VIEW_TESTS | Permissions.PROBLEM_CREATE_TEST |
+                   Permissions.PROBLEM_EDIT_TEST | Permissions.PROBLEM_REMOVE_TEST)
     display_name = "Девочка-волшебница"
     color = "#FF6AB8"
 
