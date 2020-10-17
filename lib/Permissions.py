@@ -34,30 +34,44 @@ class Permissions:
     CONTEST_VIEW_STANDINGS = 2 * 0x10 ** 9
     CONTEST_DOWNLOAD_STANDINGS = 4 * 0x10 ** 9
 
-    USERS_VIEW = 1 * 0x10 ** 10
+    LABOURS_VIEW = 1 * 0x10 ** 10
 
-    USER_VIEW = 1 * 0x10 ** 11
-    USER_DELETE = 2 * 0x10 ** 11
-    USER_LOAD_USERPIC = 4 * 0x10 ** 11
+    LABOUR_VIEW = 1 * 0x10 ** 11
+    LABOUR_CREATE = 2 * 0x10 ** 11
+    LABOUR_EDIT = 4 * 0x10 ** 11
+    LABOUR_DELETE = 8 * 0x10 ** 11
 
-    GROUPS_VIEW = 1 * 0x10 ** 12
+    LABOUR_ADD_PROBLEM = 1 * 0x10 ** 12
+    LABOUR_REMOVE_PROBLEM = 2 * 0x10 ** 12
 
-    GROUP_VIEW = 1 * 0x10 ** 13
-    GROUP_CREATE = 2 * 0x10 ** 13
-    GROUP_EDIT = 4 * 0x10 ** 13
-    GROUP_DELETE = 8 * 0x10 ** 13
+    LABOUR_PERFORM = 1 * 0x10 ** 13
+    LABOUR_VIEW_RESULTS = 2 * 0x10 ** 13
+    LABOUR_DOWNLOAD_RESULTS = 4 * 0x10 ** 13
 
-    GROUP_ADD_USER = 1 * 0x10 ** 14
-    GROUP_REMOVE_USER = 2 * 0x10 ** 14
+    USERS_VIEW = 1 * 0x10 ** 14
 
-    NEWS_CREATE = 1 * 0x10 ** 15
-    NEWS_EDIT = 2 * 0x10 ** 15
-    NEWS_DELETE = 4 * 0x10 ** 15
+    USER_VIEW = 1 * 0x10 ** 15
+    USER_DELETE = 2 * 0x10 ** 15
+    USER_LOAD_USERPIC = 4 * 0x10 ** 15
 
-    NEWS_RATE = 1 * 0x10 ** 16
+    GROUPS_VIEW = 1 * 0x10 ** 16
 
-    FEEDBACK_LEAVE = 1 * 0x10 ** 17
+    GROUP_VIEW = 1 * 0x10 ** 17
+    GROUP_CREATE = 2 * 0x10 ** 17
+    GROUP_EDIT = 4 * 0x10 ** 17
+    GROUP_DELETE = 8 * 0x10 ** 17
 
-    ASSIGN_ROLES = 1 * 0x10 ** 18
+    GROUP_ADD_USER = 1 * 0x10 ** 18
+    GROUP_REMOVE_USER = 2 * 0x10 ** 18
+
+    NEWS_CREATE = 1 * 0x10 ** 19
+    NEWS_EDIT = 2 * 0x10 ** 19
+    NEWS_DELETE = 4 * 0x10 ** 19
+
+    NEWS_RATE = 1 * 0x10 ** 20
+
+    FEEDBACK_LEAVE = 1 * 0x10 ** 21
+
+    ASSIGN_ROLES = 1 * 0x10 ** 22
 
 

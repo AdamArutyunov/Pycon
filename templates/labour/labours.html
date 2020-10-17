@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-header">
+    <h2>
+      Работы
+    </h2>
+  </div>
+  <div class="content-block">
+    {% if labours %}
+      <table class="submissions-table">
+        <tr>
+          <th class="id-td">
+            <span>
+              #
+            </span>
+          </th>
+          <th class="problemname-td">
+            <span>
+              Название
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Начало
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Конец
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Длительность
+            </span>
+          </th>
+          <th class="solutions-td">
+            <span>
+              Выполнило
+            </span>
+          </th>
+        </tr>
+        {% for labour in labours %}
+          <tr {{ "class=inactive-contest" if labour.is_finished() }}>
+            <td class="id-td">
+              {{ labour.id }}
+            </td>
+            <td class="problemname-td">
+              <a href="/labours/{{ labour.id }}">{{ labour.name }}</a>
+            </td>
+            <td class="id-td">
+              {{ labour.start_date.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
+            </td>
+            <td class="id-td">
+              {{ (labour.start_date + labour.duration).strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
+            </td>
+            <td class="id-td">
+              {{ labour.perfomance_time|string }}
+            </td>
+            <td class="id-td">
+              {{ labour.performers|length }}
+            </td>
+            {% if current_user.is_permitted(Permissions.LABOUR_DELETE) %}
+              <td class="id-td">
+                <a class="alert-danger delete-button" href="/labours/{{ labour.id }}/delete">
+                  ×
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+  {% if current_user.is_permitted(Permissions.LABOUR_CREATE) %}
+    <div class="normal-block" id="admin-features">
+      <a href="/labours/create" class="list alert-admin">
+        Создать работу
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}

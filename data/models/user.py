@@ -23,7 +23,10 @@ class UserToLabour(SqlAlchemyBase):
     user = orm.relation('User', backref=orm.backref('labours', lazy='joined', cascade='all'))
     labour_id = Column(Integer, ForeignKey('labours.id'), primary_key=True)
     labour = orm.relation('Labour', backref=orm.backref('performers', lazy='joined', cascade='all'))
-    perform_time = Column(DateTime, default=datetime.datetime.now(), nullable=False)
+    performance_date = Column(DateTime, default=datetime.datetime.now, nullable=False)
+
+    def is_finished(self):
+        return self.performance_date + self.labour.perfomance_time <= datetime.datetime.now()
 
 
 class UserToProblem(SqlAlchemyBase):

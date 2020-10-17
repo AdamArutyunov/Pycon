@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>
+    Создать работу
+  </h2>
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+
+    <div class="normal-block">
+      <h3>
+        {{ form.labour_name.label }}
+      </h3>
+      {{ form.labour_name(class="static-input") }}<br>
+      {% for error in form.labour_name.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.start_date.label }}
+      </h3>
+      {{ form.start_date() }}
+
+      {% for error in form.start_date.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+              {{ form.start_date.data }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.duration.label }}
+      </h3>
+      {{ form.duration(placeholder="В минутах, пожалуйста!", class="static-input") }}<br>
+      {% for error in form.duration.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="normal-block">
+      <h3>
+        {{ form.perfomance_time.label }}
+      </h3>
+      {{ form.perfomance_time(placeholder="И здесь тоже", class="static-input") }}<br>
+      {% for error in form.perfomance_time.errors %}
+          <p class="alert alert-danger" role="alert">
+              {{ error }}
+          </p>
+      {% endfor %}
+    </div>
+
+    <div class="big-block">
+      {{ form.submit(type="submit", value=action) }}
+    </div>
+    <div class="small-block">
+      <p class="alert alert-danger" role="alert">
+        {{message}}
+      </p>
+    </div>
+  </form>
+{% endblock %}

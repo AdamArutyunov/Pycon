@@ -3,14 +3,14 @@
 {% block content %}
   <div class="content-header" id="standings-header">
     <h2>
-      Положение
-      <a href="/contests/{{ contest.id }}">
-        контеста
+      Результаты
+      <a href="/labours/{{ labour.id }}">
+        работы
       </a>
     </h2>
   </div>
   <div class="content-block" id="standings-table">
-    {% if contest.participants %}
+    {% if labour.performers %}
       <table class="contest-problems-table">
         <tr>
           <th class="id-td">
@@ -28,7 +28,7 @@
               =
             </span>
           </th>
-          {% for problem in contest.problems %}
+          {% for problem in labour.problems %}
             <th class="id-td central-td">
               <a href="/problems/{{ problem.id }}">
                 {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
@@ -36,7 +36,7 @@
             </th>
           {% endfor %}
         </tr>
-        {% for association in standings %}
+        {% for association in results %}
           {% set user = association.user %}
           <tr>
             <td class="id-td">
@@ -51,23 +51,17 @@
             </td>
             <td class="id-td central-td">
               <span>
-                {{ user.get_solved_contest_problems_count(contest) }}
+                {{ user.get_solved_labour_problems_count(labour) }}
               </span>
             </td>
-            {% for problem in contest.problems %}
+            {% for problem in labour.problems %}
               <td class="id-td central-td">
                 {% set upa = user.get_problem_association(problem) %}
                 {% if upa %}
                   {% if upa.solved %}
                     <span class="verdict-good">
                       <b>
-                        +{{ upa.submissions if upa.submissions > 1 }}
-                      </b>
-                    </span>
-                  {% else %}
-                    <span class="verdict-bad">
-                      <b>
-                        -{{ upa.submissions }}
+                        +
                       </b>
                     </span>
                   {% endif %}
@@ -77,17 +71,19 @@
           </tr>
         {% endfor %}
       </table>
-      {% if current_user.is_permitted(Permissions.CONTEST_DOWNLOAD_STANDINGS) %}
+      {% if current_user.is_permitted(Permissions.LABOUR_DOWNLOAD_RESULTS) %}
         <div class="content-block">
-          <a href="/contests/{{ contest.id }}/standings/csv" class="alert-admin">
+          <a href="/labours/{{ labour.id }}/results/csv" class="alert-admin">
             Скачать CSV
           </a>
         </div>
       {% endif %}
     {% else %}
-      Никто не участвует в контесте :—(
+      Эту работу ещё никто не пишет.
     {% endif %}
   </div>
+
+  {% set labour_association = current_user.get_labour_association(labour) %}
   {% if labour_association %}
     <script>
     let labour_start = new Date("{{ labour_association.performance_date }}Z");

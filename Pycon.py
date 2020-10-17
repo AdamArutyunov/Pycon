@@ -54,6 +54,7 @@ def load_user(user_id):
 if __name__ == '__main__':
     import blueprints.problem
     import blueprints.contest
+    import blueprints.labour
     import blueprints.submission
     import blueprints.group
     import blueprints.news
@@ -67,6 +68,7 @@ if __name__ == '__main__':
 
     app.register_blueprint(blueprints.problem.blueprint, url_prefix='/problems')
     app.register_blueprint(blueprints.contest.blueprint, url_prefix='/contests')
+    app.register_blueprint(blueprints.labour.blueprint, url_prefix='/labours')
     app.register_blueprint(blueprints.submission.blueprint, url_prefix='/submissions')
     app.register_blueprint(blueprints.group.blueprint, url_prefix='/groups')
     app.register_blueprint(blueprints.news.blueprint, url_prefix='/news')

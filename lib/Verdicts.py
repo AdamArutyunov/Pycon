@@ -46,5 +46,10 @@ class MemoryLimitVerdict(Verdict):
         super().__init__(7, True, "ML", "Превышение лимита памяти", *args, **kwargs)
 
 
+class TestingErrorVerdict(Verdict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(8, True, "TE", "Ошибка тестирования", time=-1, *args, **kwargs)
+
+
 VERDICTS = [Verdict, TestingVerdict, OKVerdict, CompilationErrorVerdict, RuntimeErrorVerdict,
-            WrongAnswerVerdict, TimeLimitVerdict, MemoryLimitVerdict]
+            WrongAnswerVerdict, TimeLimitVerdict, MemoryLimitVerdict, TestingErrorVerdict]

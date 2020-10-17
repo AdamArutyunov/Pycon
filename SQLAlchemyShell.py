@@ -14,7 +14,7 @@ db_session.global_init(DATABASE_URI)
 session = db_session.create_session()
 
 
-user = session.query(User).get(1)
-print(user.role, user.get_role())
-user.role = 6
+assoc = session.query(UserToLabour).all()
+for a in assoc:
+    print(a, a.labour.name, a.user.login, a.performance_date, a.is_finished(), a.labour.duration)
 session.commit()

@@ -6,12 +6,6 @@ from sqlalchemy_serializer import SerializerMixin
 from ..db_session import SqlAlchemyBase
 
 
-labour_to_problem = Table('labour_to_problem', SqlAlchemyBase.metadata,
-    Column('labour', Integer, ForeignKey('labours.id')),
-    Column('problem', Integer, ForeignKey('problems.id'))
-)
-
-
 class Labour(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'labours'
 
@@ -22,6 +16,7 @@ class Labour(SqlAlchemyBase, SerializerMixin):
                             backref="labours")
     start_date = Column(DateTime, default=datetime.datetime.now, nullable=False)
     duration = Column(Interval, nullable=True)
+    perfomance_time = Column(Interval, nullable=False)
 
     def is_active(self):
         if self.is_started() and not self.is_finished():
@@ -43,3 +38,9 @@ class Labour(SqlAlchemyBase, SerializerMixin):
             return
 
         self.problems.append(problem)
+
+
+labour_to_problem = Table('labour_to_problem', SqlAlchemyBase.metadata,
+    Column('labour', Integer, ForeignKey('labours.id')),
+    Column('problem', Integer, ForeignKey('problems.id'))
+)
