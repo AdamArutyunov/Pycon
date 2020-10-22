@@ -112,12 +112,10 @@ class PythonTestChecker:
             if os.name == "posix":
                 proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
 
-            proc.wait(timeout=time_limit)
+            returncode = proc.wait(timeout=time_limit)
 
-            run.communicate()
-
-            if run.returncode:
-                raise subprocess.CalledProcessError(-1, PYTHON_COMMAND)
+            if returncode:
+                raise subprocess.CalledProcessError(returncode, PYTHON_COMMAND)
         except subprocess.CalledProcessError as e:
             error = open('temp/error.txt').read().strip().split('\n')[-1].split(':')[0]
             if error == 'SyntaxError':
@@ -165,12 +163,10 @@ class CSharpTestChecker:
             if os.name == "posix":
                 proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
 
-            proc.wait(timeout=time_limit)
+            returncode = proc.wait(timeout=time_limit)
 
-            run.communicate()
-
-            if run.returncode:
-                raise subprocess.CalledProcessError(-1, CSHARP_COMPILE_COMMAND)
+            if returncode:
+                raise subprocess.CalledProcessError(returncode, CSHARP_COMPILE_COMMAND)
         except subprocess.CalledProcessError as e:
             verdict = CompilationErrorVerdict
         except psutil.TimeoutExpired:
