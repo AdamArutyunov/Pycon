@@ -42,6 +42,7 @@ class SolutionChecker:
                 try:
                     self.check_submission(submission)
                 except Exception as e:
+                    print(e)
                     submission.set_verdict(TestingErrorVerdict())
 
                 session.commit()
@@ -113,6 +114,7 @@ class PythonTestChecker:
                 proc.rlimit(psutil.RLIMIT_AS, (MAX_MEMORY, MAX_MEMORY))
 
             returncode = proc.wait(timeout=time_limit)
+
 
             if returncode:
                 raise subprocess.CalledProcessError(returncode, PYTHON_COMMAND)
