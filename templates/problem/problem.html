@@ -91,6 +91,9 @@
       </div>
       <div class="normal-block" id="my-submissions">
         <a href="/problems/{{problem.id}}/submissions">Мои посылки</a>
+        {% if current_user.is_permitted(Permissions.SUBMISSIONS_VIEW_ALL) %}
+          <br><a href="/submissions/all?problem_id={{ problem.id }}">Все посылки</a>
+        {% endif %}
       </div>
     {% else %}
         Чтобы сдать задачу, нужно <a href="/login?next={{ request.path }}#send">войти в систему</a>

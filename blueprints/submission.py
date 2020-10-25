@@ -1,8 +1,10 @@
 from Pycon import permission_required
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template, abort, request
 from flask_login import current_user
 from data import db_session
 from data.models.submission import Submission
+from data.models.user import User
+from data.models.problem import *
 from forms.submit import *
 from lib.Verdicts import *
 from lib.Permissions import *
@@ -24,7 +26,25 @@ def submissions():
 @permission_required(Permissions.SUBMISSIONS_VIEW_ALL)
 def submissions_all():
     session = db_session.create_session()
-    submissions = session.query(Submission).order_by(Submission.id.desc()).all()
+    submissions = session.query(Submission)
+
+    user_id = request.args.get('user_id', None)
+    user = None
+    if user_id:
+        user = session.query(User).get(user_id)
+
+    if user:
+        submissions = submissions.filter(Submission.submitter == user)
+
+    problem_id = request.args.get('problem_id', None)
+    problem = None
+    if problem_id:
+        problem = session.query(Problem).get(problem_id)
+
+    if problem:
+        submissions = submissions.filter(Submission.problem == problem)
+
+    submissions = submissions.order_by(Submission.id.desc()).all()
     
     return render_template('submission/submissions.html', title="Все посылки",
                            submissions=submissions)

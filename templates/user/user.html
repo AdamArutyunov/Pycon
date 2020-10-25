@@ -55,6 +55,11 @@
       </form>
     </div>
   {% endif %}
+
+  {% if current_user.is_permitted(Permissions.SUBMISSIONS_VIEW_ALL) %}
+    <a href="/submissions/all?user_id={{ user.id }}">Посылки</a>
+  {% endif %}
+
   {% if current_user.is_permitted(Permissions.ASSIGN_ROLES) %}
     <div class="small-block">
       <form method="post">
