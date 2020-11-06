@@ -1,4 +1,4 @@
-from Pycon import permission_required
+from Pycon import permission_required, get_page_count, query_limit_page
 from flask import Blueprint, render_template, abort, request
 from flask_login import current_user
 from data import db_session
@@ -15,11 +15,17 @@ blueprint = Blueprint('submission', __name__, template_folder='/templates/submis
 @blueprint.route('/')
 @permission_required(Permissions.SUBMISSIONS_VIEW)
 def submissions():
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.submitter == current_user)\
-                  .order_by(Submission.id.desc()).all()
+                  .order_by(Submission.id.desc())
+
+    page_count = get_page_count(submissions)
+    submissions = query_limit_page(submissions, page).all()
+
     return render_template('submission/submissions.html', title="Посылки",
-                           submissions=submissions)
+                           submissions=submissions, page_count=page_count)
 
 
 @blueprint.route('/all')
@@ -29,7 +35,9 @@ def submissions_all():
     submissions = session.query(Submission)
 
     user_id = request.args.get('user_id', None)
+    page = int(request.args.get('page', 1)) - 1
     user = None
+
     if user_id:
         user = session.query(User).get(user_id)
 
@@ -44,10 +52,12 @@ def submissions_all():
     if problem:
         submissions = submissions.filter(Submission.problem == problem)
 
-    submissions = submissions.order_by(Submission.id.desc()).all()
+    submissions = submissions.order_by(Submission.id.desc())
+    page_count = get_page_count(submissions)
+    submissions = query_limit_page(submissions, page).all()
     
     return render_template('submission/submissions.html', title="Все посылки",
-                           submissions=submissions)
+                           submissions=submissions, page_count=page_count)
 
 
 @blueprint.route('/<int:submission_id>')

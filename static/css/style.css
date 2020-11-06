@@ -530,6 +530,27 @@ a.primary-button {
   color: var(--light-grey);
 }
 
+.page-scroller {
+  display: table;
+  margin: 10px 0;
+  font-family: "Consolas", monospace;
+}
+
+.page-scroller-item {
+  display: table-cell;
+  font-size: 20pt;
+  height: 40px;
+  width: 40px;
+  text-align: left;
+  margin-right: 20px;
+}
+
+.page-scroller a {
+  border: none;
+
+}
+
+
 #limits {
   color: var(--light-grey);
 }

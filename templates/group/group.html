@@ -6,9 +6,9 @@
       {{ group.name }}
     </h1>
   </div>
-
+  {{ page_scroller() }}
   <div class="content-block">
-    {% if group.users %}
+    {% if users %}
       <table class="submissions-table">
         <tr>
           <th class="id-td">
@@ -22,7 +22,7 @@
             </span>
           </th>
         </tr>
-        {% for user in group.users %}
+        {% for user in users %}
           <tr>
             <td class="id-td">
               {{ loop.index }}
@@ -63,4 +63,5 @@
       </a>
     {% endif %}
   </div>
+  {{ page_scroller() }}
 {% endblock %}

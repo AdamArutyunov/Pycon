@@ -71,14 +71,14 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     @property
     def solved_problems(self):
         session = db_session.create_session()
-        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
+        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) &
                                                                    (UserToProblem.solved == True)).all()
         return problem_associations
 
     @property
     def unsolved_problems(self):
         session = db_session.create_session()
-        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) and
+        problem_associations = session.query(UserToProblem).filter((UserToProblem.user == self) &
                                                                    (UserToProblem.solved == False)).all()
         return problem_associations
 

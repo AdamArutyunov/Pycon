@@ -1,3 +1,31 @@
+{% macro page_scroller() %}
+  {% set page = request.args.get('page', 1)|int %}
+  {% set prev_possibility = (page > 1) %}
+  {% set next_possibility = (page < page_count) %}
+
+  {% if prev_possibility or next_possibility %}
+    <div class="page-scroller">
+      {% if prev_possibility %}
+        <script>
+            document.write('<a href="' + updateURLParameter('{{ request.path }}', 'page', {{ page - 1 }}) + '">')
+            document.write('<div class="page-scroller-item">←</div></a>')
+        </script>
+      {% endif %}
+
+      <div class="page-scroller-item">
+        {{ page }}
+      </div>
+
+      {% if next_possibility %}
+        <script>
+            document.write('<a href="' + updateURLParameter('{{ request.path }}', 'page', {{ page + 1 }}) + '">')
+            document.write('<div class="page-scroller-item">→</div></a>')
+        </script>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
 <!doctype html>
 <html lang="en">
   <head>

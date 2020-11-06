@@ -6,6 +6,7 @@
       Контесты
     </h2>
   </div>
+  {{ page_scroller() }}
   <div class="content-block">
     {% if contests %}
       <table class="submissions-table">
@@ -72,4 +73,5 @@
       </a>
     </div>
   {% endif %}
+  {{ page_scroller() }}
 {% endblock %}

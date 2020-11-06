@@ -1,5 +1,5 @@
-from Pycon import permission_required, PyconSolutionChecker
-from flask import Blueprint, render_template, abort, redirect
+from Pycon import permission_required, PyconSolutionChecker, get_page_count, query_limit_page
+from flask import Blueprint, render_template, abort, redirect, request
 from flask_login import current_user
 from data import db_session
 from data.models.problem import Problem
@@ -17,9 +17,15 @@ blueprint = Blueprint('problem', __name__, template_folder='/templates/problem')
 @blueprint.route('/')
 @permission_required(Permissions.PROBLEMS_VIEW)
 def problems():
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
-    problems = session.query(Problem).order_by(Problem.id.desc()).all()
-    return render_template('problem/problems.html', title="Задачи", problems=problems)
+
+    problems = session.query(Problem).order_by(Problem.id.desc())
+    page_count = get_page_count(problems)
+    problems = query_limit_page(problems, page).all()
+
+    return render_template('problem/problems.html', title="Задачи", problems=problems, page_count=page_count)
 
 
 @blueprint.route('/<int:problem_id>', methods=["GET", "POST"])
@@ -125,24 +131,36 @@ def delete_problem(problem_id):
 @blueprint.route('/<int:problem_id>/submissions')
 @permission_required(Permissions.PROBLEM_VIEW_SUBMISSIONS)
 def problem_submissions(problem_id):
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
     submissions = session.query(Submission).join(Problem).filter((Submission.submitter == current_user) &
                                                                  (Problem.id == problem_id))\
-                  .order_by(Submission.id.desc()).all()
+                  .order_by(Submission.id.desc())
+
+    page_count = get_page_count(submissions)
+    submissions = query_limit_page(submissions, page).all()
+
     return render_template('submission/submissions.html', title=f"Посылки задачи №{problem_id}",
-                           submissions=submissions)
+                           submissions=submissions, page_count=page_count)
 
 
 @blueprint.route('/<int:problem_id>/tests')
 @permission_required(Permissions.PROBLEM_VIEW_TESTS)
 def problem_tests(problem_id):
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
     problem = session.query(Problem).get(problem_id)
     if not problem:
         abort(404)
 
+    tests = session.query(Test).filter(Test.problem == problem)
+    page_count = get_page_count(tests)
+    tests = query_limit_page(tests, page).all()
+
     return render_template('problem/problem_tests.html', title=f"Тесты задачи №{problem_id}",
-                           problem=problem, Permissions=Permissions)
+                           tests=tests, problem=problem, page_count=page_count)
 
 
 @blueprint.route('/<int:problem_id>/tests/create', methods=["GET", "POST"])

@@ -115,7 +115,6 @@ class PythonTestChecker:
 
             returncode = proc.wait(timeout=time_limit)
 
-
             if returncode:
                 raise subprocess.CalledProcessError(returncode, PYTHON_COMMAND)
         except subprocess.CalledProcessError as e:

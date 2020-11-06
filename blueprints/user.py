@@ -1,6 +1,6 @@
 import os
-from Pycon import permission_required
-from flask import Blueprint, render_template, abort, redirect
+from Pycon import permission_required, get_page_count, query_limit_page
+from flask import Blueprint, render_template, abort, redirect, request
 from flask_login import current_user
 from data import db_session
 from data.models.user import User
@@ -18,11 +18,16 @@ blueprint = Blueprint('user', __name__, template_folder='/templates/users')
 @blueprint.route('/')
 @permission_required(Permissions.USERS_VIEW)
 def users():
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
 
-    users = session.query(User).all()
+    users = session.query(User).order_by(User.id.desc())
 
-    return render_template('user/users.html', title="Пользователи", users=users)
+    page_count = get_page_count(users)
+    users = query_limit_page(users, page).all()
+
+    return render_template('user/users.html', title="Пользователи", users=users, page_count=page_count)
 
 
 @blueprint.route('/<int:user_id>', methods=["GET", "POST"])

@@ -6,14 +6,15 @@
       Тесты <a href="/problems/{{ problem.id }}">задачи №{{ problem.id }}</a>
     </h3>
   </div>
+  {{ page_scroller() }}
   <div class="content-block">
     <a href="/problems/{{ problem.id }}/tests/create">
       Создать тест
     </a>
   </div>
-  {% if problem.tests %}
+  {% if tests %}
     <div class="content-block" id="tests">
-      {% for test in problem.tests %}
+      {% for test in tests %}
         <h4>
           #{{ loop.index }}
           {% if current_user.is_permitted(Permissions.PROBLEM_EDIT_TEST) %}
@@ -49,4 +50,5 @@
       {% endfor %}
     </div>
   {% endif %}
+  {{ page_scroller() }}
 {% endblock %}

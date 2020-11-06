@@ -1,5 +1,5 @@
-from Pycon import permission_required
-from flask import Blueprint, render_template, abort, redirect
+from Pycon import permission_required, get_page_count, query_limit_page
+from flask import Blueprint, render_template, abort, redirect, request
 from flask_login import current_user
 from data import db_session
 from data.models.group import Group
@@ -16,14 +16,22 @@ blueprint = Blueprint('group', __name__, template_folder='/templates/group')
 @blueprint.route('/')
 @permission_required(Permissions.GROUPS_VIEW)
 def groups():
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
-    groups = session.query(Group).order_by(Group.id).all()
-    return render_template('group/groups.html', title="Группы", groups=groups)
+    groups = session.query(Group).order_by(Group.id)
+
+    page_count = get_page_count(groups)
+    groups = query_limit_page(groups, page)
+
+    return render_template('group/groups.html', title="Группы", groups=groups, page_count=page_count)
 
 
 @blueprint.route('/<int:group_id>')
 @permission_required(Permissions.GROUP_VIEW)
 def group(group_id):
+    page = int(request.args.get('page', 1)) - 1
+
     session = db_session.create_session()
     group = session.query(Group).get(group_id)
 
@@ -33,7 +41,11 @@ def group(group_id):
     if not (current_user.group == group or current_user.get_role() == AdminRole):
         abort(403)
 
-    return render_template('group/group.html', title=group.name, group=group)
+    users = session.query(User).filter(User.group == group)
+    page_count = get_page_count(users)
+    users = query_limit_page(users, page)
+
+    return render_template('group/group.html', title=group.name, group=group, users=users, page_count=page_count)
 
 
 @blueprint.route('/create', methods=["GET", "POST"])

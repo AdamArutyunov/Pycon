@@ -1,7 +1,7 @@
 import datetime
 import csv
-from Pycon import permission_required
-from flask import Blueprint, render_template, abort, redirect, send_file
+from Pycon import permission_required, get_page_count, query_limit_page
+from flask import Blueprint, render_template, abort, redirect, send_file, request
 from flask_login import current_user
 from data import db_session
 from data.models.problem import Problem
@@ -16,10 +16,15 @@ blueprint = Blueprint('labour', __name__, template_folder='/templates/labour')
 @blueprint.route('/')
 @permission_required(Permissions.LABOURS_VIEW)
 def labours():
-    session = db_session.create_session()
-    labours = session.query(Labour).order_by(Labour.id.desc()).all()
+    page = int(request.args.get('page', 1)) - 1
 
-    return render_template('labour/labours.html', title="Работы", labours=labours)
+    session = db_session.create_session()
+    labours = session.query(Labour).order_by(Labour.id.desc())
+
+    page_count = get_page_count(labours)
+    labours = query_limit_page(labours, page).all()
+
+    return render_template('labour/labours.html', title="Работы", labours=labours, page_count=page_count)
 
 
 @blueprint.route('/<int:labour_id>')

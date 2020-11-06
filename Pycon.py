@@ -10,6 +10,7 @@ from lib.Languages import *
 from lib.Roles import *
 from lib.Verdicts import *
 from lib import Roles
+from math import ceil
 
 
 app = Flask(__name__)
@@ -22,7 +23,6 @@ login_manager.login_view = 'login'
 
 PyconSolutionChecker = SolutionChecker()
 PyconSolutionCheckerProcess = Process(target=PyconSolutionChecker.parse)
-
 
 login_manager.anonymous_user = PyconAnonymousUser
 
@@ -43,6 +43,20 @@ def permission_required(permission):
             abort(403)
         return new_func
     return inner_decorator
+
+
+def get_query_rows(query):
+    count_query = query.statement.with_only_columns([func.count()]).order_by(None)
+    count = query.session.execute(count_query).scalar()
+    return count
+
+
+def get_page_count(query):
+    return ceil(get_query_rows(query) / PAGE_SIZE)
+
+
+def query_limit_page(query, page):
+    return query.offset(page * PAGE_SIZE).limit(PAGE_SIZE)
 
 
 @login_manager.user_loader

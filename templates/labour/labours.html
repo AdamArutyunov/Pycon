@@ -6,6 +6,7 @@
       Работы
     </h2>
   </div>
+  {{ page_scroller() }}
   <div class="content-block">
     {% if labours %}
       <table class="submissions-table">
@@ -80,4 +81,5 @@
       </a>
     </div>
   {% endif %}
+  {{ page_scroller() }}
 {% endblock %}

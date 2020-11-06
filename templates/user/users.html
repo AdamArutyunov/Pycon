@@ -6,6 +6,7 @@
       Пользователи
     </h2>
   </div>
+  {{ page_scroller() }}
   <div class="content-block">
     {% if users %}
       <table class="submissions-table">
@@ -44,4 +45,5 @@
       </table>
     {% endif %}
   </div>
+  {{ page_scroller() }}
 {% endblock %}

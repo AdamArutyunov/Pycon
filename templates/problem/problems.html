@@ -6,6 +6,7 @@
       Задачи
     </h2>
   </div>
+  {{ page_scroller() }}
   <div class="content-block">
     {% if problems %}
       <table class="submissions-table">
@@ -62,4 +63,5 @@
       </a>
     </div>
   {% endif %}
+  {{ page_scroller() }}
 {% endblock %}

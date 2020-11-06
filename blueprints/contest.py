@@ -1,7 +1,7 @@
 import datetime
 import csv
-from Pycon import permission_required
-from flask import Blueprint, render_template, abort, redirect, send_file
+from Pycon import permission_required, get_page_count, query_limit_page
+from flask import Blueprint, render_template, abort, redirect, send_file, request
 from flask_login import current_user
 from data import db_session
 from data.models.problem import Problem
@@ -16,10 +16,15 @@ blueprint = Blueprint('contest', __name__, template_folder='/templates/contest')
 @blueprint.route('/')
 @permission_required(Permissions.CONTESTS_VIEW)
 def contests():
-    session = db_session.create_session()
-    contests = session.query(Contest).order_by(Contest.id.desc()).all()
+    page = int(request.args.get('page', 1)) - 1
 
-    return render_template('contest/contests.html', title="Контесты", contests=contests)
+    session = db_session.create_session()
+    contests = session.query(Contest).order_by(Contest.id.desc())
+
+    page_count = get_page_count(contests)
+    contests = query_limit_page(contests, page)
+
+    return render_template('contest/contests.html', title="Контесты", contests=contests, page_count=page_count)
 
 
 @blueprint.route('/<int:contest_id>')
