@@ -25,7 +25,7 @@
         {% for user in users %}
           <tr>
             <td class="id-td">
-              {{ loop.index }}
+              {{ user.id }}
             </td>
             <td class="problemname-td">
               <a href="/users/{{ user.id }}">{{ user.login }}</a>
