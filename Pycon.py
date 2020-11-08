@@ -45,14 +45,8 @@ def permission_required(permission):
     return inner_decorator
 
 
-def get_query_rows(query):
-    count_query = query.statement.with_only_columns([func.count()]).order_by(None)
-    count = query.session.execute(count_query).scalar()
-    return count
-
-
 def get_page_count(query):
-    return ceil(get_query_rows(query) / PAGE_SIZE)
+    return ceil(query.count() / PAGE_SIZE)
 
 
 def query_limit_page(query, page):
