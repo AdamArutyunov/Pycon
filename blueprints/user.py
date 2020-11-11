@@ -22,7 +22,7 @@ def users():
 
     session = db_session.create_session()
 
-    users = session.query(User).order_by(User.id.desc())
+    users = session.query(User).order_by(User.role.desc()).order_by(User.id.desc())
 
     page_count = get_page_count(users)
     users = query_limit_page(users, page).all()
