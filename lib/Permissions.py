@@ -19,6 +19,7 @@ class Permissions:
     SUBMISSIONS_VIEW = 1 * 0x10 ** 5
     SUBMISSIONS_VIEW_ALL = 2 * 0x10 ** 5
     SUBMISSION_VIEW = 4 * 0x10 ** 5
+    SUBMISSION_SET_VERDICT = 8 * 0x10 ** 5
 
     CONTESTS_VIEW = 1 * 0x10 ** 6
 

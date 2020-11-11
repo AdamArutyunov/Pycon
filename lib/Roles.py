@@ -82,6 +82,7 @@ class TeacherRole(Role):
     permissions = (GroupLeaderRole.permissions | Permissions.PROBLEM_CREATE | Permissions.PROBLEM_EDIT |
                    Permissions.PROBLEM_DELETE | Permissions.PROBLEM_VIEW_TESTS | Permissions.PROBLEM_CREATE_TEST |
                    Permissions.PROBLEM_EDIT_TEST | Permissions.PROBLEM_REMOVE_TEST | Permissions.SUBMISSIONS_VIEW_ALL |
+                   Permissions.SUBMISSION_SET_VERDICT |
                    Permissions.CONTEST_CREATE | Permissions.CONTEST_EDIT | Permissions.CONTEST_DELETE |
                    Permissions.CONTEST_ADD_PROBLEM | Permissions.CONTEST_REMOVE_PROBLEM |
                    Permissions.CONTEST_DOWNLOAD_STANDINGS | Permissions.LABOUR_VIEW_RESULTS |

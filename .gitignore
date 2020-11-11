@@ -3,6 +3,9 @@
 __pycache__/
 /temp/
 .idea
+
 /static/img/userpics/
+/static/img/miscellaneous/
+
 /.idea/
 /alembic/env.py

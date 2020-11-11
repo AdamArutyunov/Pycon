@@ -1,5 +1,5 @@
 from Pycon import permission_required, get_page_count, query_limit_page
-from flask import Blueprint, render_template, abort, request
+from flask import Blueprint, render_template, abort, request, redirect
 from flask_login import current_user
 from data import db_session
 from data.models.submission import Submission
@@ -74,3 +74,18 @@ def submission(submission_id):
 
     return render_template('submission/submission.html', title=f"Посылка №{submission.id}",
                            submission=submission)
+
+
+@blueprint.route('/<int:submission_id>/recheck')
+@permission_required(Permissions.SUBMISSION_SET_VERDICT)
+def submission_recheck(submission_id):
+    session = db_session.create_session()
+
+    submission = session.query(Submission).get(submission_id)
+    if not submission:
+        abort(404)
+
+    submission.verdict = 0
+    session.commit()
+
+    return redirect(f"../{submission.id}")
