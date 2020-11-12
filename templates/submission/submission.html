@@ -49,6 +49,10 @@
     <br><br>
     Память: <b>INOP</b>
 
+    {% if current_user.is_permitted(Permissions.SUBMISSION_SET_VERDICT) %}
+      <br><br><a href="/submissions/{{ submission.id }}/recheck" class="primary-button">Отправить на перепроверку</a>
+    {% endif %}
+
   </div>
 
   <script type="text/javascript">

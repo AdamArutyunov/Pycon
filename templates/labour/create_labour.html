@@ -29,17 +29,17 @@
       {% for error in form.start_date.errors %}
           <p class="alert alert-danger" role="alert">
               {{ error }}
-              {{ form.start_date.data }}
           </p>
       {% endfor %}
     </div>
 
     <div class="normal-block">
       <h3>
-        {{ form.duration.label }}
+        {{ form.end_date.label }}
       </h3>
-      {{ form.duration(placeholder="В минутах, пожалуйста!", class="static-input") }}<br>
-      {% for error in form.duration.errors %}
+      {{ form.end_date() }}
+
+      {% for error in form.end_date.errors %}
           <p class="alert alert-danger" role="alert">
               {{ error }}
           </p>

@@ -105,6 +105,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
             problem_association.solved = False
             self.problems.append(problem_association)
         else:
+            problem_association.solved = False
             problem_association.submissions += 1
 
     def is_problem_solved(self, problem):

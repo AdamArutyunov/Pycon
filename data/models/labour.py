@@ -15,7 +15,7 @@ class Labour(SqlAlchemyBase, SerializerMixin):
                             secondary="labour_to_problem",
                             backref="labours")
     start_date = Column(DateTime, default=datetime.datetime.now, nullable=False)
-    duration = Column(Interval, nullable=True)
+    end_date = Column(DateTime, default=datetime.datetime.now, nullable=False)
     perfomance_time = Column(Interval, nullable=False)
 
     def is_active(self):
@@ -29,7 +29,7 @@ class Labour(SqlAlchemyBase, SerializerMixin):
         return False
 
     def is_finished(self):
-        if self.duration and datetime.datetime.now() >= self.start_date + self.duration:
+        if self.end_date < datetime.datetime.now():
             return True
         return False
 

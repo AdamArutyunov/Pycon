@@ -48,7 +48,7 @@ def create_labour():
         labour = Labour()
         labour.name = form.labour_name.data
         labour.start_date = form.start_date.data
-        labour.duration = datetime.timedelta(minutes=form.duration.data)
+        labour.end_date = form.end_date.data
         labour.perfomance_time = datetime.timedelta(minutes=form.perfomance_time.data)
 
         session.add(labour)
@@ -72,7 +72,7 @@ def edit_labour(labour_id):
     if form.validate_on_submit():
         labour.name = form.labour_name.data
         labour.start_date = form.start_date.data
-        labour.duration = datetime.timedelta(minutes=form.duration.data)
+        labour.end_date = form.end_date.data
         labour.perfomance_time = datetime.timedelta(minutes=form.perfomance_time.data)
 
         session.commit()
@@ -81,7 +81,7 @@ def edit_labour(labour_id):
 
     form.labour_name.data = labour.name
     form.start_date.data = labour.start_date
-    form.duration.data = int(labour.duration.total_seconds() // 60)
+    form.end_date.data = labour.end_date
     form.perfomance_time.data = int(labour.perfomance_time.total_seconds() // 60)
 
     return render_template('labour/create_labour.html', title=f"Редактирование работы №{labour_id}",

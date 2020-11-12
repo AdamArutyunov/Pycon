@@ -54,7 +54,7 @@
               {{ labour.start_date.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
             </td>
             <td class="id-td">
-              {{ (labour.start_date + labour.duration).strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
+              {{ labour.end_date.strftime("%d.%m.%Y<br>%H:%M:%S")|safe }}
             </td>
             <td class="id-td">
               {{ labour.perfomance_time|string }}
