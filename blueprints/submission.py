@@ -86,6 +86,10 @@ def submission_recheck(submission_id):
         abort(404)
 
     submission.verdict = 0
+    submission.test = None
+    submission.time = None
+    submission.memory = None
+
     session.commit()
 
     return redirect(f"../{submission.id}")
