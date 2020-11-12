@@ -13,7 +13,12 @@
 
   <div class="small-block" style="line-height: 1.5">
     <h4>#{{ user.id }}</h4>
+
+    {% if current_user.get_role() == Roles.AdminRole %}
+      Почта: <a href="mailto:{{ user.email }}">{{ user.email }}</a><br>
+    {% endif %}
     Группа:
+
     {% if user.group %}
       {% if current_user.is_permitted(Permissions.GROUP_VIEW) and current_user.group == user.group or
             current_user.get_role() == Roles.AdminRole %}
