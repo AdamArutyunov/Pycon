@@ -32,6 +32,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css?{{ range(10000000000)|random }}">
+  <link rel="stylesheet" type="text/css" href="/static/css/new_style.css?{{ range(10000000000)|random }}">
     <link href="/static/css/codemirror.css" rel="stylesheet">
     <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
     <script src="/static/js/jquery-3.5.1.min.js"></script>
@@ -39,6 +40,10 @@
     <script src="/static/js/python.js"></script>
     <script src="/static/js/clike.js"></script>
     <script src="/static/js/main.js"></script>
+
+    {% assets "sass" %}
+      <script type="text/css" src="css/sass/style.sass"></script>
+    {% endassets %}
 
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript" >

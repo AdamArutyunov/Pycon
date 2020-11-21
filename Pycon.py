@@ -1,6 +1,8 @@
 import os
-from flask import Flask, abort, redirect, request
+from flask import Flask, abort, redirect, request, render_template
 from flask_login import LoginManager, current_user
+from flask_assets import Environment, Bundle
+from slimish_jinja import SlimishExtension
 from multiprocessing import Process
 from functools import wraps
 from data import db_session
@@ -14,6 +16,14 @@ from math import ceil
 
 
 app = Flask(__name__)
+app.jinja_options['extensions'].append(SlimishExtension)
+
+assets = Environment(app)
+assets.url = "/static"
+sass = Bundle("css/sass/style.sass", filters="libsass",
+              output="css/new_style.css", depends='**/*.sass')
+assets.register('sass', sass)
+
 app.config['SECRET_KEY'] = 'pycon_pycon_secret_key'
 app.config['DATABASE_URI'] = DATABASE_URI
 
@@ -57,6 +67,15 @@ def query_limit_page(query, page):
 def load_user(user_id):
     session = db_session.create_session()
     return session.query(User).get(user_id)
+
+
+@app.route("/article/<path:path>")
+def article(path):
+    try:
+        return render_template(f"miscellaneous/{path}")
+    except Exception as e:
+        print(e)
+        abort(404)
 
 
 if __name__ == '__main__':

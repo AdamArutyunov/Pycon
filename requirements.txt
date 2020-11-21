@@ -1,6 +1,12 @@
 flask
 flask-login
 flask-wtf
+
 sqlalchemy
 sqlalchemy-serializer
+
 psutil
+
+Flask-Assets
+libsass
+slimish_jinja
